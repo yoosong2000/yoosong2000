@@ -1,0 +1,766 @@
+<title>The Current Issue</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #EDEEE6;
+    --surface: #FBFBF7;
+    --surface-alt: #E3E5D9;
+    --ink: #1C1E19;
+    --ink-soft: #565A4F;
+    --ink-faint: #8B8F80;
+    --accent: #2E5C51;
+    --accent-ink: #1E4038;
+    --accent-soft: #DCE6DF;
+    --border: #D6D8C9;
+    --warn-ink: #7A5A20;
+    --warn-bg: #F1E6C9;
+    --warn-border: #D8C08A;
+    --shadow: 0 1px 2px rgba(28,30,25,0.04), 0 6px 20px rgba(28,30,25,0.05);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141815;
+      --surface: #1C211D;
+      --surface-alt: #242A24;
+      --ink: #E9EAE2;
+      --ink-soft: #ABB0A2;
+      --ink-faint: #6F756A;
+      --accent: #74BBA6;
+      --accent-ink: #A7D9C8;
+      --accent-soft: #24322C;
+      --border: #323830;
+      --warn-ink: #E4C878;
+      --warn-bg: #332C18;
+      --warn-border: #4E4426;
+      --shadow: 0 1px 2px rgba(0,0,0,0.2), 0 6px 20px rgba(0,0,0,0.3);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #141815;
+    --surface: #1C211D;
+    --surface-alt: #242A24;
+    --ink: #E9EAE2;
+    --ink-soft: #ABB0A2;
+    --ink-faint: #6F756A;
+    --accent: #74BBA6;
+    --accent-ink: #A7D9C8;
+    --accent-soft: #24322C;
+    --border: #323830;
+    --warn-ink: #E4C878;
+    --warn-bg: #332C18;
+    --warn-border: #4E4426;
+    --shadow: 0 1px 2px rgba(0,0,0,0.2), 0 6px 20px rgba(0,0,0,0.3);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Work Sans', ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: var(--accent-ink); }
+  a:focus-visible, button:focus-visible, input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 1.25rem 4rem;
+  }
+
+  header.top {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 2.25rem 0 1.25rem;
+  }
+
+  header.top .inner {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+  }
+
+  .eyebrow {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    margin: 0 0 0.6rem;
+  }
+
+  h1 {
+    font-family: 'Newsreader', ui-serif, Georgia, serif;
+    font-weight: 600;
+    font-size: clamp(1.9rem, 1.55rem + 1.4vw, 2.5rem);
+    line-height: 1.1;
+    margin: 0 0 0.55rem;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+
+  .sub {
+    color: var(--ink-soft);
+    font-size: 0.98rem;
+    line-height: 1.55;
+    max-width: 56ch;
+    margin: 0 0 1.3rem;
+  }
+
+  .searchbar {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.55rem 0.8rem;
+  }
+
+  .searchbar svg { flex: none; color: var(--ink-faint); }
+
+  .searchbar input {
+    border: none;
+    background: transparent;
+    color: var(--ink);
+    font-family: 'Work Sans', sans-serif;
+    font-size: 0.92rem;
+    width: 100%;
+    outline: none;
+  }
+
+  .searchbar input::placeholder { color: var(--ink-faint); }
+
+  .gaps {
+    margin-top: 0.9rem;
+    background: var(--warn-bg);
+    border: 1px solid var(--warn-border);
+    border-radius: 8px;
+    padding: 0.75rem 0.9rem 0.85rem;
+  }
+
+  .gaps-label {
+    margin: 0 0 0.4rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--warn-ink);
+  }
+
+  .gaps ul {
+    margin: 0;
+    padding: 0 0 0 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .gaps li {
+    font-size: 0.84rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+
+  .gaps a {
+    color: var(--warn-ink);
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px solid var(--warn-border);
+  }
+  .gaps a:hover { border-color: var(--warn-ink); }
+
+  nav.jump {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 1.1rem auto 0;
+    max-width: 760px;
+    padding: 0 1.25rem;
+  }
+
+  nav.jump a {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    color: var(--ink-soft);
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.3rem 0.65rem;
+    white-space: nowrap;
+  }
+
+  nav.jump a:hover { color: var(--accent-ink); border-color: var(--accent); }
+
+  .group { margin-top: 2.6rem; scroll-margin-top: 1rem; }
+
+  .group-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+  }
+
+  .group-head h2 {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--accent-ink);
+    margin: 0;
+  }
+
+  .group-head .count {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--ink-faint);
+  }
+
+  .group-note {
+    font-size: 0.86rem;
+    color: var(--ink-faint);
+    margin: -0.5rem 0 1.1rem;
+    max-width: 56ch;
+    line-height: 1.5;
+  }
+
+  .cards { display: flex; flex-direction: column; gap: 0.9rem; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1.35rem 1.35rem;
+    box-shadow: var(--shadow);
+    scroll-margin-top: 1rem;
+  }
+
+  .card.flag {
+    border-style: dashed;
+    border-color: var(--warn-border);
+    background: color-mix(in srgb, var(--surface) 88%, var(--warn-bg));
+  }
+
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .card-title {
+    font-family: 'Newsreader', ui-serif, Georgia, serif;
+    font-size: 1.28rem;
+    font-weight: 500;
+    margin: 0;
+    line-height: 1.25;
+  }
+
+  .card-link {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    text-decoration: none;
+    color: var(--ink-soft);
+    white-space: nowrap;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1px;
+  }
+
+  .card-link:hover { color: var(--accent-ink); border-color: var(--accent); }
+
+  .meta-row {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin: 0.5rem 0 1rem;
+    flex-wrap: wrap;
+  }
+
+  .publisher {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-faint);
+  }
+
+  .badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+    border-radius: 999px;
+    padding: 0.2rem 0.6rem;
+  }
+
+  .badge.warn { background: var(--warn-bg); color: var(--warn-ink); }
+
+  .caveat {
+    font-size: 0.82rem;
+    font-style: italic;
+    color: var(--ink-faint);
+    background: var(--surface-alt);
+    border-radius: 6px;
+    padding: 0.5rem 0.7rem;
+    margin: 0 0 1rem;
+    line-height: 1.5;
+  }
+
+  ul.articles { list-style: none; margin: 0; padding: 0; }
+
+  ul.articles li {
+    padding: 0.65rem 0;
+    border-top: 1px solid var(--border);
+  }
+  ul.articles li:first-child { border-top: none; padding-top: 0; }
+
+  .a-title {
+    font-size: 0.96rem;
+    font-weight: 500;
+    line-height: 1.4;
+    display: block;
+  }
+  a.a-title { text-decoration: none; color: var(--ink); }
+  a.a-title:hover { color: var(--accent-ink); text-decoration: underline; }
+
+  .a-author {
+    display: block;
+    font-size: 0.83rem;
+    color: var(--ink-soft);
+    margin-top: 0.15rem;
+  }
+
+  .a-vol {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--ink-faint);
+    margin-left: 0.4rem;
+  }
+
+  footer {
+    margin-top: 3.2rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.82rem;
+    color: var(--ink-faint);
+    line-height: 1.6;
+  }
+
+  footer strong { color: var(--ink-soft); font-weight: 600; }
+
+  .no-results {
+    display: none;
+    color: var(--ink-faint);
+    font-size: 0.9rem;
+    padding: 2rem 0;
+    text-align: center;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .card { transition: border-color 0.15s ease; }
+  }
+</style>
+
+<header class="top">
+  <div class="inner">
+    <p class="eyebrow">Journal watch · philosophy of science &amp; social epistemology</p>
+    <h1>The Current Issue</h1>
+    <p class="sub">A snapshot of the latest tables of contents across thirteen journals in and around the field — first compiled 22 August 2026, rechecked the week of 1 September 2026. Search across titles and authors, or jump straight to a journal.</p>
+    <label class="searchbar">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="search" type="text" placeholder="Search titles, authors, journals…" autocomplete="off">
+    </label>
+    <div class="gaps">
+      <p class="gaps-label">Worth checking with your RUB library access</p>
+        <li><a href="#data">Philosophy of Data</a> (thematic) — public search returned little; a proper database search would likely surface more.</li>
+      </ul>
+    </div>
+  </div>
+</header>
+
+<nav class="jump" aria-label="Jump to journal">
+  <a href="#philsci">Phil. of Science</a>
+  <a href="#bjps">BJPS</a>
+  <a href="#synthese">Synthese</a>
+  <a href="#erkenntnis">Erkenntnis</a>
+  <a href="#shps">SHPS</a>
+  <a href="#ejps">EJPS</a>
+  <a href="#posc">Perspectives</a>
+  <a href="#episteme">Episteme</a>
+  <a href="#socepist">Social Epist.</a>
+  <a href="#jphil">J. of Philosophy</a>
+  <a href="#philstud">Phil. Studies</a>
+  <a href="#ppr">PPR</a>
+  <a href="#metaphil">Metaphilosophy</a>
+  <a href="#abm">Agent-Based Models</a>
+  <a href="#data">Phil. of Data</a>
+  <a href="#models">Phil. of Models</a>
+</nav>
+
+<div class="wrap">
+
+  <section class="group" id="group-philsci">
+    <div class="group-head"><h2>Philosophy of Science</h2><span class="count">7 journals</span></div>
+    <p class="group-note">General epistemology and methodology of science, plus its history — the core venues.</p>
+    <div class="cards">
+
+      <article class="card" id="philsci" data-search="philosophy of science cambridge core understanding symptoms diagnosis cure bodily reintegration helene scott-fordsmand origin explanation christophe malaterre equivalent theories and ontological commitment reevaluating heterogeneity in evidence synthesis ecological rationality without externalism david thorstad the method of hypotheses in early modern natural philosophy alireza fatollahi excess structure in the constrained hamiltonian formalism clara bradley">
+        <div class="card-top">
+          <h3 class="card-title">Philosophy of Science</h3>
+          <a class="card-link" href="https://www.cambridge.org/core/journals/philosophy-of-science/issue/277152500EF598BCD4141DF2A2E2C788" target="_blank" rel="noopener">View issue ↗</a>
+        </div>
+        <div class="meta-row"><span class="publisher">Cambridge Core · PSA</span><span class="badge">Vol 93, No. 3 — Jul 2026</span></div>
+        <ul class="articles">
+          <li><span class="a-title">Understanding Symptoms: Diagnosis, Cure, and Bodily Reintegration</span><span class="a-author">Helene Scott-Fordsmand</span></li>
+          <li><span class="a-title">Origin Explanation</span><span class="a-author">Christophe Malaterre</span></li>
+          <li><span class="a-title">Ecological Rationality Without Externalism</span><span class="a-author">David Thorstad</span></li>
+          <li><span class="a-title">The Method of Hypotheses in Early Modern Natural Philosophy</span><span class="a-author">Alireza Fatollahi</span></li>
+          <li><span class="a-title">Excess Structure in the Constrained Hamiltonian Formalism</span><span class="a-author">Clara Bradley</span></li>
+          <li><span class="a-title">Equivalent Theories and Ontological Commitment</span></li>
+          <li><span class="a-title">Reevaluating Heterogeneity in Evidence Synthesis</span></li>
+        </ul>
+      </article>
+
+      <article class="card" id="bjps" data-search="british journal for the philosophy of science bjps understanding structural representations marc artiga a hierarchy of spacetime symmetries holes to heraclitus jb manchak thomas barrett varying evidential standards as a matter of justice ahmad elabbar infinite scale scepticism probing the epistemology of the limit of infinite degrees of freedom and hilbert space non-uniqueness james fraser fixing stochastic dominance jeffrey sanford russell pain modularity and cognitive constitution blazej skrzypulec geometric pooling a user's guide richard pettigrew jonathan weisberg between scientific and empathetic understanding the case of auditory verbal hallucination shivam patel the many problems of spacetime emergence in quantum gravity rasmus jaksland kian salimkhani interpretative models and the biological significance of fisher's fundamental theorem of natural selection zhixiang cheng the informational profile of valence the metasemantic argument for imperativism manolo martinez luca barlassina causation and the conservation of energy in general relativity sebastian murgueitio ramirez james read andres paez a pluralist perspective on shape constancy e j green">
+        <div class="card-top">
+          <h3 class="card-title">British Journal for the Philosophy of Science</h3>
+          <a class="card-link" href="https://www.journals.uchicago.edu/toc/bjps/current" target="_blank" rel="noopener">View issue ↗</a>
+        </div>
+        <div class="meta-row"><span class="publisher">Univ. of Chicago Press</span><span class="badge">Vol 77, No. 3 — Sep 2026</span></div>
+        <p class="caveat">Full contents confirmed via a user-supplied copy of the issue — the earlier "verify against issue" flag is resolved.</p>
+        <ul class="articles">
+          <li><span class="a-title">Understanding Structural Representations<span class="a-vol">p. 595</span></span><span class="a-author">Marc Artiga</span></li>
+          <li><span class="a-title">A Hierarchy of Spacetime Symmetries: Holes to Heraclitus<span class="a-vol">p. 621</span></span><span class="a-author">JB Manchak &amp; Thomas Barrett</span></li>
+          <li><span class="a-title">Varying Evidential Standards as a Matter of Justice<span class="a-vol">p. 643</span></span><span class="a-author">Ahmad Elabbar</span></li>
+          <li><span class="a-title">Infinite Scale Scepticism: Probing the Epistemology of the Limit of Infinite Degrees of Freedom and Hilbert Space Non-Uniqueness<span class="a-vol">p. 671</span></span><span class="a-author">James D. Fraser</span></li>
+          <li><span class="a-title">Fixing Stochastic Dominance<span class="a-vol">p. 701</span></span><span class="a-author">Jeffrey Sanford Russell</span></li>
+          <li><span class="a-title">Pain: Modularity and Cognitive Constitution<span class="a-vol">p. 727</span></span><span class="a-author">Błażej Skrzypulec</span></li>
+          <li><span class="a-title">Geometric Pooling: A User's Guide<span class="a-vol">p. 749</span></span><span class="a-author">Richard Pettigrew &amp; Jonathan Weisberg</span></li>
+          <li><span class="a-title">Between Scientific and Empathetic Understanding: The Case of Auditory Verbal Hallucination<span class="a-vol">p. 773 · Editors' Choice</span></span><span class="a-author">Shivam Patel</span></li>
+          <li><span class="a-title">The Many Problems of Spacetime Emergence in Quantum Gravity<span class="a-vol">p. 795</span></span><span class="a-author">Rasmus Jaksland &amp; Kian Salimkhani</span></li>
+          <li><span class="a-title">Interpretative Models and the Biological Significance of Fisher's Fundamental Theorem of Natural Selection<span class="a-vol">p. 823</span></span><span class="a-author">Zhixiang Cheng</span></li>
+          <li><span class="a-title">The Informational Profile of Valence: The Metasemantic Argument for Imperativism<span class="a-vol">p. 847</span></span><span class="a-author">Manolo Martínez &amp; Luca Barlassina</span></li>
+          <li><span class="a-title">Causation and the Conservation of Energy in General Relativity<span class="a-vol">p. 867</span></span><span class="a-author">Sebastián Murgueitio Ramírez, James Read &amp; Andrés Páez</span></li>
+          <li><span class="a-title">A Pluralist Perspective on Shape Constancy<span class="a-vol">p. 895</span></span><span class="a-author">E. J. Green</span></li>
+        </ul>
+      </article>
+
+      <article class="card" id="synthese" data-search="synthese springer online first on progress in science and metaphysics kian salimkhani matthias rolffs machine learning and theory-ladenness a phenomenological account alberto termine emanuele ratti alessandro facchini disentangling scientific and scientists understanding boge schuster stoll coercive risk and the lottery default herman veluwenkamp">
+        <div class="card-top">
+          <h3 class="card-title">Synthese</h3>
+          <a class="card-link" href="https://link.springer.com/journal/11229/online-first" target="_blank" rel="noopener">View latest ↗</a>
+        </div>
+        <div class="meta-row"><span class="publisher">Springer</span><span class="badge">Online First — Vols 207–208</span></div>
+        <ul class="articles">
+          <li><span class="a-title">E-values as statistical evidence: A comparison to Bayes factors, likelihoods, and p-values<span class="a-vol">new · 26 Aug 2026</span></span><span class="a-author">Ben Chugg, Aaditya Ramdas &amp; Peter Grünwald</span></li>
+          <li><span class="a-title">On progress in science and metaphysics</span><span class="a-author">Kian Salimkhani &amp; Matthias Rolffs</span></li>
+          <li><span class="a-title">Machine learning and theory-ladenness: a phenomenological account</span><span class="a-author">Alberto Termine, Emanuele Ratti &amp; Alessandro Facchini</span></li>
+          <li><span class="a-title">Disentangling scientific and scientists' understanding</span><span class="a-author">Boge, Schuster &amp; Stoll</span></li>
+          <li><span class="a-title">Coercive risk and the lottery default</span><span class="a-author">Herman Veluwenkamp</span></li>
+        </ul>
+      </article>
+
+      <article class="card" id="erkenntnis" data-search="erkenntnis springer did the standard interactions emerge inflation reheating and particle creation in the very early universe simon clery gauvain leconte-chevillard andrea roselli balancing on the edge of concreteness martin vacek the immortal science of ml machine learning and the theory-free ideal scarcity in the credibility economy a bayesian analysis of testimonial injustice">
+        <div class="card-top">
+          <h3 class="card-title">Erkenntnis</h3>
+          <a class="card-link" href="https://link.springer.com/journal/10670/volumes-and-issues/91-6" target="_blank" rel="noopener">View issue ↗</a>
+        </div>
+        <div class="meta-row"><span class="publisher">Springer</span><span class="badge">Vol 91, No. 6 — Aug 2026</span></div>
+        <ul class="articles">
+          <li><span class="a-title">Vaidya's Method of Variation in Imagination Revisited: A Web-Consequentialist Approach<span class="a-vol">new · ~1 Sep 2026</span></span><span class="a-author">Violeta Conde &amp; Concha Martínez-Vidal</span></li>
+          <li><span class="a-title">Did the Standard Interactions Emerge at t = 10⁻³² s? Inflation, Reheating and Particle Creation in the Very Early Universe</span><span class="a-author">Simon Cléry, Gauvain Leconte-Chevillard &amp; Andrea Roselli</span></li>
+          <li><span class="a-title">Balancing on the Edge of Concreteness</span><span class="a-author">Martin Vacek</span></li>
+          <li><span class="a-title">The Immortal Science of ML: Machine Learning and the Theory-Free Ideal</span></li>
+          <li><span class="a-title">Scarcity in the Credibility Economy: A Bayesian Analysis of Testimonial Injustice</span></li>
+        </ul>
+      </article>
+
+      <article class="card" id="shps" data-search="studies in history and philosophy of science shps elsevier strategic ignorance and the management of performative effects lessons from climate economics lukas beck henrik thoren spontaneous contexts explanatory diversity in biological self-assembly sebastian sander-oest echoes of georgescu-roegen's thermodynamic view in latin american development debates beatriz macchione saes francisco gallego pereira large language models for history philosophy and sociology of science arno simons michael zichert adrian wuthrich the precision fallacy on the futility of preference purification johanna thoma">
+        <div class="card-top">
+          <h3 class="card-title">Studies in History and Philosophy of Science</h3>
+          <a class="card-link" href="https://www.sciencedirect.com/journal/studies-in-history-and-philosophy-of-science" target="_blank" rel="noopener">View issue ↗</a>
+        </div>
+        <div class="meta-row"><span class="publisher">Elsevier</span><span class="badge">Vol 118 — Aug 2026</span></div>
+        <ul class="articles">
+          <li><span class="a-title">Strategic ignorance, and the management of performative effects: Lessons from climate economics</span><span class="a-author">Lukas Beck &amp; Henrik Thorén</span></li>
+          <li><span class="a-title">Spontaneous contexts: Explanatory diversity in biological self-assembly</span><span class="a-author">Sebastian Sander-Oest</span></li>
+          <li><span class="a-title">Echoes of Georgescu-Roegen's thermodynamic view in Latin American development debates</span><span class="a-author">Beatriz Macchione Saes &amp; Francisco Gallego Pereira</span></li>
+          <li><span class="a-title">Large language models for history, philosophy, and sociology of science<span class="a-vol">Vol 117</span></span><span class="a-author">Arno Simons, Michael Zichert &amp; Adrian Wüthrich</span></li>
+          <li><span class="a-title">The precision fallacy: On the futility of preference purification<span class="a-vol">Vol 117</span></span><span class="a-author">Johanna Thoma</span></li>
+        </ul>
+      </article>
+
+      <article class="card" id="ejps" data-search="european journal for philosophy of science ejps springer the fate of particles in finite-temperature quantum field theory adam koberinski participation and immersive imagination in thought experiments daniele molinari natural kinds pluralism refined a meta-level defense risalatul hukmi science-based policymaking the need to think holistically realistically and institutionally faik kurtulmus pursuitworthiness of breakthrough experiments transforming emerging intuitions into established norms szymon milkos inductive risk meets engineering risk error management and pursuitworthiness in collider physics marianne van panhuys daria jadreskic">
+        <div class="card-top">
+          <h3 class="card-title">European Journal for Philosophy of Science</h3>
+          <a class="card-link" href="https://link.springer.com/journal/13194/online-first" target="_blank" rel="noopener">View latest ↗</a>
+        </div>
+        <div class="meta-row"><span class="publisher">Springer</span><span class="badge">Online First — 2026</span></div>
+        <ul class="articles">
+          <li><span class="a-title">The fate of particles in finite-temperature quantum field theory</span><span class="a-author">Adam Koberinski</span></li>
+          <li><span class="a-title">Participation and immersive imagination in thought experiments</span><span class="a-author">Daniele Molinari</span></li>
+          <li><span class="a-title">Inductive risk meets engineering risk: Error management and pursuitworthiness in collider physics</span><span class="a-author">Marianne van Panhuys &amp; Daria Jadreškić</span></li>
+          <li><span class="a-title">Pursuitworthiness of breakthrough experiments: transforming emerging intuitions into established norms</span><span class="a-author">Szymon Miłkoś</span></li>
+          <li><span class="a-title">Science-based policymaking: the need to think holistically, realistically, and institutionally</span><span class="a-author">Faik Kurtulmus</span></li>
+          <li><span class="a-title">Natural kinds pluralism refined: a meta-level defense</span><span class="a-author">Risalatul Hukmi</span></li>
+        </ul>
+      </article>
+
+      <article class="card" id="posc" data-search="perspectives on science mit press biases in scientific inquiry jamie shaw manuela fernandez pinto torsten wilholt cassirer and the arithmetization of physics marco giovanelli what tmt cannot see scientific objectivity and knowledge prioritization mallory hrehor atoms minima and indivisibles in nicholas of autrecourt aurelien robert">
+        <div class="card-top">
+          <h3 class="card-title">Perspectives on Science</h3>
+          <a class="card-link" href="https://direct.mit.edu/posc/issue" target="_blank" rel="noopener">View issue ↗</a>
+        </div>
+        <div class="meta-row"><span class="publisher">MIT Press</span><span class="badge">Vol 34, No. 3 — Jun 2026</span></div>
+        <ul class="articles">
+          <li><span class="a-title">Biases in Scientific Inquiry</span><span class="a-author">Jamie Shaw, Manuela Fernandez Pinto &amp; Torsten Wilholt</span></li>
+          <li><span class="a-title">Cassirer and the Arithmetization of Physics</span><span class="a-author">Marco Giovanelli</span></li>
+          <li><span class="a-title">Atoms, Minima, and Indivisibles in Nicholas of Autrecourt<span class="a-vol">Vol 34.2</span></span><span class="a-author">Aurelien Robert</span></li>
+          <li><span class="a-title">What TMT Cannot See: Scientific Objectivity and Knowledge Prioritization<span class="a-vol">Vol 34.1</span></span><span class="a-author">Mallory A. Hrehor</span></li>
+        </ul>
+      </article>
+
+    </div>
+  </section>
+
+  <section class="group" id="group-socepist">
+    <div class="group-head"><h2>Social Epistemology</h2><span class="count">2 journals</span></div>
+    <p class="group-note">Collective knowledge, testimony, trust, and epistemic injustice — the field's dedicated venues.</p>
+    <div class="cards">
+
+      <article class="card" id="episteme" data-search="episteme cambridge core sexual epistemic injustice ognjen arandjelovic on trusting chatbots p d magnus social epistemology for individuals like us against radical epistemic environmentalism or why uncritically deferring to authority is still irrational the fate of expertise after wikipedia">
+        <div class="card-top">
+          <h3 class="card-title">Episteme</h3>
+          <a class="card-link" href="https://www.cambridge.org/core/journals/episteme/firstview" target="_blank" rel="noopener">View FirstView ↗</a>
+        </div>
+        <div class="meta-row"><span class="publisher">Cambridge Core</span><span class="badge">FirstView · Vol 23, No. 2 — Jun 2026</span></div>
+        <ul class="articles">
+          <li><span class="a-title">Sexual Epistemic Injustice</span><span class="a-author">Ognjen Arandjelović</span></li>
+          <li><span class="a-title">On Trusting Chatbots</span><span class="a-author">P. D. Magnus</span></li>
+          <li><span class="a-title">Social Epistemology for Individuals Like Us</span></li>
+          <li><span class="a-title">Against Radical Epistemic Environmentalism (Or Why Uncritically Deferring to Authority Is Still Irrational)</span></li>
+          <li><span class="a-title">The Fate of Expertise after Wikipedia</span></li>
+        </ul>
+      </article>
+
+      <article class="card" id="socepist" data-search="social epistemology taylor francis openness and inequity in scientific research sabina leonelli paola castano rena alcalay more than a nasa badge metadocencia and capacity building for open science communities in latin america laura acion global citizen science as a source of epistemic diversity the case of ebird india rose trappes a portrait of the scientist as a user openness and temporality of scientific software frederic wieber alexandre hocquet the sequence and the standard an account of participatory informational format exclusion pife nathanael sheehan critically engaged pragmatism scientific norm and social pragmatist epistemology for ai science evaluation tools carole lee epistemic disadvantage in open science practices joachim vandekerckhove not all research environments are created equal structural injustice in low-resourced scientific settings and its epistemic implications knowledge and politics reflections on challenges to open science helen longino how has opening up science changed scientific practices rachel ankeny">
+        <div class="card-top">
+          <h3 class="card-title">Social Epistemology</h3>
+          <a class="card-link" href="https://www.tandfonline.com/toc/tsep20/40/5" target="_blank" rel="noopener">View issue ↗</a>
+        </div>
+        <div class="meta-row"><span class="publisher">Taylor &amp; Francis</span><span class="badge">Vol 40, No. 5 — Sep 2026</span></div>
+        <p class="caveat">Full contents confirmed via RSS feed — special issue on openness and inequity in open science. Earlier "verify against issue" flag resolved.</p>
+        <ul class="articles">
+          <li><span class="a-title">Openness and Inequity in Scientific Research<span class="a-vol">pp. 511–516 · editorial</span></span><span class="a-author">Sabina Leonelli, Paola Castaño &amp; Rena Alcalay</span></li>
+          <li><span class="a-title">More Than a NASA Badge: MetaDocencia and Capacity Building for Open Science Communities in Latin America<span class="a-vol">pp. 517–535</span></span><span class="a-author">Laura Ación et al.</span></li>
+          <li><span class="a-title">Global Citizen Science as a Source of Epistemic Diversity: The Case of eBird India<span class="a-vol">pp. 536–556</span></span><span class="a-author">Rose Trappes</span></li>
+          <li><span class="a-title">A Portrait of the Scientist as a User: Openness and Temporality of Scientific Software<span class="a-vol">pp. 557–570</span></span><span class="a-author">Frédéric Wieber &amp; Alexandre Hocquet</span></li>
+          <li><span class="a-title">The Sequence and the Standard: An Account of Participatory Informational Format Exclusion (PIFE)<span class="a-vol">pp. 571–583</span></span><span class="a-author">Nathanael Sheehan</span></li>
+          <li><span class="a-title">Critically Engaged Pragmatism: Scientific Norm and Social, Pragmatist Epistemology for AI Science Evaluation Tools<span class="a-vol">pp. 584–598</span></span><span class="a-author">Carole J. Lee</span></li>
+          <li><span class="a-title">Epistemic Disadvantage in Open Science Practices<span class="a-vol">pp. 599–615</span></span><span class="a-author">Rena Alcalay &amp; Joachim Vandekerckhove</span></li>
+          <li><span class="a-title">Not All Research Environments are Created Equal: Structural Injustice in Low-Resourced Scientific Settings and Its Epistemic Implications<span class="a-vol">pp. 616–635</span></span><span class="a-author">Sabina Leonelli</span></li>
+          <li><span class="a-title">Knowledge and Politics: Reflections on Challenges to Open Science<span class="a-vol">pp. 636–640</span></span><span class="a-author">Helen E. Longino</span></li>
+          <li><span class="a-title">How Has 'Opening Up' Science Changed Scientific Practices?<span class="a-vol">pp. 641–646</span></span><span class="a-author">Rachel A. Ankeny</span></li>
+        </ul>
+      </article>
+
+    </div>
+  </section>
+
+  <section class="group" id="group-general">
+    <div class="group-head"><h2>Adjacent General Philosophy</h2><span class="count">4 journals</span></div>
+    <p class="group-note">Broader venues that regularly carry work in epistemology and philosophy of science alongside everything else.</p>
+    <div class="cards">
+
+      <article class="card" id="jphil" data-search="journal of philosophy pdcnet mathematical access worries and accounting for knowledge of logical coherence sharon berry just a little gay how sexual orientation comes in degrees kevin richardson">
+        <div class="card-top">
+          <h3 class="card-title">Journal of Philosophy</h3>
+          <a class="card-link" href="https://www.pdcnet.org/jphil/toc" target="_blank" rel="noopener">View issue ↗</a>
+        </div>
+        <div class="meta-row"><span class="publisher">Philosophy Documentation Center</span><span class="badge">Vol CXXIII, No. 5 — May 2026</span></div>
+        <p class="caveat">Confirmed via the issue's own contents page — the earlier "unverifiable" flag is resolved. This TOC couldn't be search-indexed or fetched directly; it took a user-supplied copy to pin down, so it may still be a step or two behind the true latest issue.</p>
+        <ul class="articles">
+          <li><span class="a-title">Mathematical Access Worries and Accounting for Knowledge of Logical Coherence</span><span class="a-author">Sharon Berry</span></li>
+          <li><span class="a-title">"Just a Little Gay": How Sexual Orientation Comes in Degrees</span><span class="a-author">Kevin Richardson</span></li>
+        </ul>
+      </article>
+
+      <article class="card" id="philstud" data-search="philosophical studies springer animating scientific understanding alfredo vernazzani arguments and closure trenton merricks moral disagreement is special regina rini in defense of artificial suffering kamil mamak the super moral status of artificial superintelligence joan llorca albareda jon rueda francisco lara generalised remembering james openshaw many meanings many speech acts christine tiefensee consequentializing ends nolan art whitaker">
+        <div class="card-top">
+          <h3 class="card-title">Philosophical Studies</h3>
+          <a class="card-link" href="https://link.springer.com/journal/11098/online-first" target="_blank" rel="noopener">View latest ↗</a>
+        </div>
+        <div class="meta-row"><span class="publisher">Springer</span><span class="badge">Online First — Vol 183</span></div>
+        <ul class="articles">
+          <li><span class="a-title">Animating scientific understanding</span><span class="a-author">Alfredo Vernazzani</span></li>
+          <li><span class="a-title">Moral disagreement is special</span><span class="a-author">Regina Rini</span></li>
+          <li><span class="a-title">Arguments and closure</span><span class="a-author">Trenton Merricks</span></li>
+          <li><span class="a-title">The super moral status of artificial superintelligence</span><span class="a-author">Joan Llorca Albareda, Jon Rueda &amp; Francisco Lara</span></li>
+          <li><span class="a-title">In defense of artificial suffering</span><span class="a-author">Kamil Mamak</span></li>
+          <li><span class="a-title">Generalised remembering</span><span class="a-author">James Openshaw</span></li>
+          <li><span class="a-title">Many meanings, many speech acts?</span><span class="a-author">Christine Tiefensee</span></li>
+          <li><span class="a-title">Consequentializing ends</span><span class="a-author">Nolan Art Whitaker</span></li>
+        </ul>
+      </article>
+
+      <article class="card" id="ppr" data-search="philosophy and phenomenological research ppr wiley do we need a metaphysics of gender murphy imposing mind onto world christopher fruge romantic domination lucy mcdonald how seriously should we take ai welfare constraints from the epistemology of consciousness preston lennon forgive because you were forgiven mathew">
+        <div class="card-top">
+          <h3 class="card-title">Philosophy and Phenomenological Research</h3>
+          <a class="card-link" href="https://onlinelibrary.wiley.com/toc/19331592/2026/113/1" target="_blank" rel="noopener">View issue ↗</a>
+        </div>
+        <div class="meta-row"><span class="publisher">Wiley</span><span class="badge">Vol 113, No. 1 — Jul 2026</span></div>
+        <ul class="articles">
+          <li><a class="a-title" href="https://doi.org/10.1111/phpr.70148" target="_blank" rel="noopener">How Seriously Should We Take AI Welfare? Constraints From the Epistemology of Consciousness</a><span class="a-author">Preston Lennon</span></li>
+          <li><a class="a-title" href="https://doi.org/10.1111/phpr.70142" target="_blank" rel="noopener">Imposing Mind Onto World</a><span class="a-author">Christopher Frugé</span></li>
+          <li><a class="a-title" href="https://doi.org/10.1111/phpr.70144" target="_blank" rel="noopener">Romantic Domination</a><span class="a-author">Lucy McDonald</span></li>
+          <li><a class="a-title" href="https://doi.org/10.1111/phpr.70147" target="_blank" rel="noopener">Do We Need a Metaphysics of Gender?</a><span class="a-author">Murphy</span></li>
+          <li><a class="a-title" href="https://doi.org/10.1111/phpr.70114" target="_blank" rel="noopener">Forgive, Because You Were Forgiven</a><span class="a-author">Mathew</span></li>
+        </ul>
+      </article>
+
+      <article class="card" id="metaphil" data-search="metaphilosophy wiley metaphysics reimagined david weissman continental philosophy is indeed rigorous j edward hackett philosophical inquiry and controversial views jack kwong human attention as a philosophical problem the question and the nature of questions d graham burnett from no sense of place to no sense of the world screen-centered senses and the problem of worldlessness zheng liu">
+        <div class="card-top">
+          <h3 class="card-title">Metaphilosophy</h3>
+          <a class="card-link" href="https://onlinelibrary.wiley.com/journal/14679973" target="_blank" rel="noopener">View journal ↗</a>
+        </div>
+        <div class="meta-row"><span class="publisher">Wiley</span><span class="badge">Vol 57 — 2026</span></div>
+        <ul class="articles">
+          <li><a class="a-title" href="https://doi.org/10.1111/meta.70031" target="_blank" rel="noopener">Philosophical Inquiry and Controversial Views</a><span class="a-author">Jack M. C. Kwong</span></li>
+          <li><a class="a-title" href="https://doi.org/10.1111/meta.70030" target="_blank" rel="noopener">Metaphysics Reimagined</a><span class="a-author">David Weissman</span></li>
+          <li><a class="a-title" href="https://doi.org/10.1111/meta.70024" target="_blank" rel="noopener">Human Attention as a Philosophical Problem: The Question, and the Nature of Questions</a><span class="a-author">D. Graham Burnett</span></li>
+          <li><a class="a-title" href="https://doi.org/10.1111/meta.70029" target="_blank" rel="noopener">From 'No Sense of Place' to 'No Sense of the World': Screen-Centered Senses and the Problem of Worldlessness</a><span class="a-author">Zheng Liu</span></li>
+          <li><a class="a-title" href="https://doi.org/10.1111/meta.70039" target="_blank" rel="noopener">Continental Philosophy Is Indeed Rigorous!</a></li>
+        </ul>
+      </article>
+
+    </div>
+  </section>
+
+  <section class="group" id="group-thematic">
+    <div class="group-head"><h2>Thematic Watch</h2><span class="count">3 themes</span></div>
+    <p class="group-note">Cross-journal: recent work (2024–2026) on three threads running through your reading — pulled from PhilPapers and PhilSci-Archive rather than any single venue.</p>
+    <div class="cards">
+
+      <article class="card" id="abm" data-search="agent-based models philosophy of science social epistemology capturing argument in agent-based models leon assaad rafael fuchs kirsty phillips klee schoppl ulrike hahn examining network effects in an argumentative agent-based model of scientific inquiry annemarie borg daniel frey dunja seselja christian strasser epistemic control and the normativity of machine learning-based science emanuele ratti theory choice in epistemic networks five ways to avoid premature convergence nicolas jonard samuli reijula luigi marengo networks dynamics and explanation james woodward the science contract scientific inquiry public trust in science and the division of zetetic labor gabriele contessa">
+        <div class="card-top">
+          <h3 class="card-title">Agent-Based Models</h3>
+          <a class="card-link" href="https://philpapers.org/s/agent-based%20models%20philosophy%20of%20science" target="_blank" rel="noopener">Search PhilPapers ↗</a>
+        </div>
+        <div class="meta-row"><span class="publisher">Epistemic networks · division of cognitive labor · simulation</span></div>
+        <ul class="articles">
+          <li><a class="a-title" href="https://philpapers.org/rec/ASSCAI" target="_blank" rel="noopener">Capturing Argument in Agent-Based Models<span class="a-vol">Topoi, 2025</span></a><span class="a-author">Leon Assaad, Rafael Fuchs, Kirsty Phillips, Klee Schöppl &amp; Ulrike Hahn</span></li>
+          <li><a class="a-title" href="https://philpapers.org/rec/BORENE-2" target="_blank" rel="noopener">Examining Network Effects in an Argumentative Agent-Based Model of Scientific Inquiry<span class="a-vol">2025</span></a><span class="a-author">AnneMarie Borg, Daniel Frey, Dunja Šešelja &amp; Christian Straßer</span></li>
+          <li><a class="a-title" href="https://philsci-archive.pitt.edu/26333/" target="_blank" rel="noopener">Epistemic Control and the Normativity of Machine Learning-Based Science<span class="a-vol">preprint, 2025</span></a><span class="a-author">Emanuele Ratti</span></li>
+          <li><a class="a-title" href="https://philsci-archive.pitt.edu/26427/" target="_blank" rel="noopener">Theory Choice in Epistemic Networks: Five Ways to Avoid Premature Convergence<span class="a-vol">preprint</span></a><span class="a-author">Nicolas Jonard, Samuli Reijula &amp; Luigi Marengo</span></li>
+          <li><a class="a-title" href="https://philsci-archive.pitt.edu/25636/" target="_blank" rel="noopener">Networks, Dynamics and Explanation<span class="a-vol">Synthese 205:204</span></a><span class="a-author">James Woodward</span></li>
+          <li><a class="a-title" href="https://philpapers.org/rec/CONTSC-6" target="_blank" rel="noopener">The Science Contract: Scientific Inquiry, Public Trust in Science, and the Division of Zetetic Labor<span class="a-vol">in Inquiry: Philosophical Perspectives, Routledge, 2025</span></a><span class="a-author">Gabriele Contessa</span></li>
+        </ul>
+      </article>
+
+      <article class="card" id="data" data-search="philosophy of data epistemological foundations of data science jules desai david watson vincent wang mariarosaria taddeo luciano floridi datafication and radical empiricism the epistemological foundations of the data-science big data nexus a philosophical framework for indigenous data sovereignty and biobanking kelle dhein data quality data diversity and data provenance an ethical perspective edoardo ramalli dark data as the new challenge for big data science and the introduction of the scientific data officer bjorn schembera juan duran a logical framework for data-driven reasoning hykel hosni esther anna corsi paolo baldi data identity and perspectivism franklin jacoby">
+        <div class="card-top">
+          <h3 class="card-title">Philosophy of Data</h3>
+          <a class="card-link" href="https://philpapers.org/s/philosophy%20of%20data" target="_blank" rel="noopener">Search PhilPapers ↗</a>
+        </div>
+        <div class="meta-row"><span class="publisher">Data practices · datafication · data vs. models</span></div>
+        <ul class="articles">
+          <li><a class="a-title" href="https://link.springer.com/article/10.1007/s11135-025-02332-2" target="_blank" rel="noopener">Datafication and Radical Empiricism: The Epistemological Foundations of the Data-Science–Big Data Nexus<span class="a-vol">Quality &amp; Quantity, 2025</span></a></li>
+          <li><a class="a-title" href="https://philpapers.org/rec/DESTEF" target="_blank" rel="noopener">The Epistemological Foundations of Data Science: A Critical Analysis</a><span class="a-author">Jules Desai, David Watson, Vincent Wang, Mariarosaria Taddeo &amp; Luciano Floridi</span></li>
+          <li><a class="a-title" href="https://philsci-archive.pitt.edu/28352/" target="_blank" rel="noopener">A Philosophical Framework for Indigenous Data Sovereignty and Biobanking<span class="a-vol">preprint, 2026</span></a><span class="a-author">Kelle Dhein</span></li>
+          <li><a class="a-title" href="https://philpapers.org/rec/WALACF-2" target="_blank" rel="noopener">A challenge for adequacy-for-purpose views of data modeling<span class="a-vol">2024–2025</span></a><span class="a-author">Jacqueline Mae Wallis</span></li>
+          <li><a class="a-title" href="https://philpapers.org/rec/NORTIO-23" target="_blank" rel="noopener">The Interplay of Data, Models, and Theories in Machine Learning<span class="a-vol">2025</span></a><span class="a-author">Maria Federica Norelli, Ioannis Votsis &amp; Jon Williamson</span></li>
+          <li><a class="a-title" href="https://philpapers.org/rec/TAVAIO" target="_blank" rel="noopener">An Inclusive Ontological Breakdown of Data Analysis<span class="a-vol">2025</span></a><span class="a-author">Yashar Tavakoli</span></li>
+          <li><a class="a-title" href="https://philpapers.org/rec/KOOHCI" target="_blank" rel="noopener">Human-Data Coupling: Informational Personhood &amp; Artificial Intelligence Through Gilbert Simondon's Philosophy of Technology<span class="a-vol">2025</span></a><span class="a-author">Colin Koopman</span></li>
+          <li><a class="a-title" href="https://philpapers.org/rec/STEDDA-14" target="_blank" rel="noopener">Data dispossession: against the property model of data<span class="a-vol">2024–2025</span></a><span class="a-author">E. Stefan Kehlenbach</span></li>
+          <li><a class="a-title" href="https://philpapers.org/rec/KUCTQO" target="_blank" rel="noopener">The Question of Diversity of Data in AI Development<span class="a-vol">2025</span></a><span class="a-author">Alžbeta Kuchtová</span></li>
+          <li><a class="a-title" href="https://philpapers.org/rec/BOKUDU" target="_blank" rel="noopener">Understanding Data Uncertainty<span class="a-vol">2025</span></a><span class="a-author">Alisa Bokulich &amp; Wendy Parker</span></li>
+          <li><a class="a-title" href="https://philpapers.org/rec/WYLTST" target="_blank" rel="noopener">Timing Science: The Temporal Role of Scientists in the Construction of Data<span class="a-vol">2024–2025</span></a><span class="a-author">Caitlin Donahue Wylie</span></li>
+          <li><a class="a-title" href="https://philpapers.org/rec/RAMDQD" target="_blank" rel="noopener">Data Quality, Data Diversity and Data Provenance: An Ethical Perspective<span class="a-vol">in Improving Technology Through Ethics, 2024</span></a><span class="a-author">Edoardo Ramalli</span></li>
+          <li><a class="a-title" href="https://philpapers.org/rec/LANOEE-3" target="_blank" rel="noopener">On Epistemic Extractivism and the Ethics of Data-Sharing<span class="a-vol">2025</span></a><span class="a-author">Karl Landström</span></li>
+          <li><a class="a-title" href="https://philpapers.org/rec/SAMRFT-2" target="_blank" rel="noopener">Responsibility for the Environmental Impact of Data-Intensive Research: An Exploration of UK Health Researchers<span class="a-vol">2025</span></a><span class="a-author">Gabrielle Samuel</span></li>
+          <li><a class="a-title" href="https://philpapers.org/rec/CHACPA-26" target="_blank" rel="noopener">Conceptual, Philosophical, and Epistemological Aspects of Data Analysis<span class="a-vol">2025</span></a><span class="a-author">Sidharta Chatterjee &amp; Mousumi Samanta</span></li>
+          <li><a class="a-title" href="https://philpapers.org/rec/SCHDDA-11" target="_blank" rel="noopener">Dark Data as the New Challenge for Big Data Science and the Introduction of the Scientific Data Officer<span class="a-vol">2024–2025</span></a><span class="a-author">Björn Schembera &amp; Juan M. Durán</span></li>
+          <li><a class="a-title" href="https://philpapers.org/rec/GRATAO-35" target="_blank" rel="noopener">Three Aspects of Data Worlds<span class="a-vol">2025</span></a><span class="a-author">Jonathan Gray</span></li>
+          <li><a class="a-title" href="https://philpapers.org/rec/HUAPPG" target="_blank" rel="noopener">Performing Platform Governance: Facebook and the Stage Management of Data Relations<span class="a-vol">2025</span></a><span class="a-author">Karen Huang &amp; P. M. Krafft</span></li>
+          <li><a class="a-title" href="https://philpapers.org/rec/HOSALF" target="_blank" rel="noopener">A Logical Framework for Data-Driven Reasoning<span class="a-vol">2024–2025</span></a><span class="a-author">Hykel Hosni, Esther Anna Corsi &amp; Paolo Baldi</span></li>
+          <li><a class="a-title" href="https://philpapers.org/rec/KAMPOD-2" target="_blank" rel="noopener">Philosophy of Data Science for Corpus Linguistics<span class="a-vol">2026</span></a><span class="a-author">Kazuho Kambara &amp; Tsukasa Yamanaka</span></li>
+          <li><a class="a-title" href="https://philpapers.org/rec/LIMLBX" target="_blank" rel="noopener">Machines Learn Better with Better Data Ontology: Lessons from Philosophy of Induction and Machine Learning Practice<span class="a-vol">2025</span></a><span class="a-author">Dan Li</span></li>
+          <li><a class="a-title" href="https://philpapers.org/rec/JACDIA-2" target="_blank" rel="noopener">Data Identity and Perspectivism<span class="a-vol">2024–2025</span></a><span class="a-author">Franklin Jacoby</span></li>
+          <li><a class="a-title" href="https://philpapers.org/rec/HILLAT-14" target="_blank" rel="noopener">Life and the law in the era of data-driven agency<span class="a-vol">eds. 2024</span></a><span class="a-author">Mireille Hildebrandt &amp; Kieron O'Hara (eds.)</span></li>
+          <li><a class="a-title" href="https://philpapers.org/rec/LLOVOD" target="_blank" rel="noopener">Varieties of Data-Centric Science: Regional Climate Modeling and Model Organism Research<span class="a-vol">2025</span></a><span class="a-author">Elisabeth Lloyd, Greg Lusk, Stuart Gluck &amp; Seth McGinnis</span></li>
+        </ul>
+      </article>
+
+      <article class="card" id="models" data-search="philosophy of scientific models idealizations scientific models and fictions marco buzzoni model-based science as epistemic warfare lorenzo magnani explaining with simulation models matthias ackermann inference and representation oscar westerblad mauricio suarez the literalist fallacy and the free energy principle michael david kirchhoff julian kiverstein ian robertson digging deeper with deep learning explanatory understanding and deep neural networks claus beisbart uncertainties about link uncertainty ml models as phenomenological models sara pernille jensen scientific progress in model-based fields till grune-yanoff caterina marchionni">
+        <div class="card-top">
+          <h3 class="card-title">Philosophy of Models</h3>
+          <a class="card-link" href="https://philpapers.org/s/philosophy%20of%20scientific%20models" target="_blank" rel="noopener">Search PhilPapers ↗</a>
+        </div>
+        <div class="meta-row"><span class="publisher">Model-based reasoning · idealization · simulation</span></div>
+        <ul class="articles">
+          <li><a class="a-title" href="https://philpapers.org/rec/BUZISM" target="_blank" rel="noopener">Idealizations, Scientific Models and Fictions<span class="a-vol">2025</span></a><span class="a-author">Marco Buzzoni</span></li>
+          <li><a class="a-title" href="https://philpapers.org/rec/MAGMSA" target="_blank" rel="noopener">Model-Based Science as Epistemic Warfare: Scientific Models in a Static and a Dynamic Perspective<span class="a-vol">2025</span></a><span class="a-author">Lorenzo Magnani</span></li>
+          <li><span class="a-title">Explaining with Simulation Models<span class="a-vol">SHPS, 2025</span></span><span class="a-author">Matthias Ackermann</span></li>
+          <li><span class="a-title">Inference and Representation<span class="a-vol">book forum, SHPS, 2026</span></span><span class="a-author">Oscar Westerblad on Mauricio Suárez</span></li>
+          <li><span class="a-title">The Literalist Fallacy and the Free Energy Principle<span class="a-vol">BJPS, 2025</span></span><span class="a-author">Michael David Kirchhoff, Julian Kiverstein &amp; Ian Robertson</span></li>
+          <li><span class="a-title">Digging Deeper with Deep Learning? Explanatory Understanding and Deep Neural Networks<span class="a-vol">EJPS, 2025</span></span><span class="a-author">Claus Beisbart</span></li>
+          <li><span class="a-title">Uncertainties About Link Uncertainty: ML Models as Phenomenological Models<span class="a-vol">Synthese, 2026</span></span><span class="a-author">Sara Pernille Jensen</span></li>
+          <li><span class="a-title">Scientific Progress in Model-Based Fields<span class="a-vol">2025</span></span><span class="a-author">Till Grüne-Yanoff &amp; Caterina Marchionni</span></li>
+        </ul>
+      </article>
+
+    </div>
+  </section>
+
+  <p class="no-results" id="noResults">No articles or journals match that search.</p>
+
+  <footer>
+    <p><strong>How this was built.</strong> First compiled 22–23 August 2026 by searching each publisher's table-of-contents page and, for the thematic watch, PhilPapers and PhilSci-Archive; rechecked 1 September 2026 for anything newer (BJPS and Social Epistemology had both moved to a new issue number — flagged above). Direct page fetches were blocked in this session both times, so entries come from indexed search snippets rather than a full crawl of every issue. Coverage is representative, not exhaustive — an article with no byline shown means an author name wasn't surfaced, not that one doesn't exist, and an issue flagged "verify against issue" has a newer issue number than its listed articles reflect. Click "View issue" or "Search PhilPapers" on any card for the fuller, current picture.</p>
+  </footer>
+
+</div>
+
+<script>
+  (function () {
+    var input = document.getElementById('search');
+    var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
+    var groups = Array.prototype.slice.call(document.querySelectorAll('.group'));
+    var noResults = document.getElementById('noResults');
+
+    input.addEventListener('input', function () {
+      var q = input.value.trim().toLowerCase();
+      var totalVisible = 0;
+
+      groups.forEach(function (group) {
+        var groupCards = group.querySelectorAll('.card');
+        var visibleInGroup = 0;
+        groupCards.forEach(function (card) {
+          var match = !q || (card.dataset.search || '').indexOf(q) !== -1;
+          card.style.display = match ? '' : 'none';
+          if (match) { visibleInGroup++; totalVisible++; }
+        });
+        group.style.display = visibleInGroup > 0 ? '' : 'none';
+      });
+
+      noResults.style.display = totalVisible === 0 ? 'block' : 'none';
+    });
+  })();
+</script>
