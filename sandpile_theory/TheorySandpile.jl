@@ -17,16 +17,33 @@ The lattice geometry carries the "you cannot jump to a distant theory" claim:
 a scientist reaches a far-away theory only by the intervening theories being
 developed first, one topple at a time.
 
-Everything is standard Abelian BTW except two additions:
+Everything is standard Abelian BTW except three additions:
 
   * `visits[pos]` — how many scientists have *ever* worked on a theory.
     Irreversible: theories accumulate development, sand does not.
   * priority credit — the first `credit_slots` arrivals at a theory earn
-    `credit_decay^k` each; everyone after them earns nothing.  Credit in
+    `credit_decay^k` each; everyone after them earn nothing.  Credit in
     science goes to whoever gets there first.
+  * a novelty bonus and probabilistic theory creation (only active under the
+    `:novelty` drive) — see `choose_theory` and `topple!`.
 
-Four driving rules let you ask what the *entry rule of new scientists* does to
-the critical state; see `choose_theory`.
+Five driving rules let you ask what the *entry rule of new scientists* does
+to the critical state:
+
+  * `:uniform`        — classic BTW driving: a scientist starts anywhere.
+  * `:avoid_crowded`  — compares `sample` theories, takes the least worked one
+                        (priority credit makes crowded theories worthless).
+  * `:matthew`        — the opposite: joins the most crowded of `sample`
+                        theories.  Hot topics attract more people.
+  * `:frontier`       — looks for an undeveloped theory adjacent to a developed
+                        one, i.e. works the edge of what is known.
+  * `:novelty`        — continuous version of `:avoid_crowded`/`:frontier`,
+                        tuned by `novelty_weight` ∈ [0,1]. Below 0.5 it behaves
+                        like `:avoid_crowded`; at and above 0.5 it actively
+                        prefers undeveloped theories and lets toppling spawn
+                        new ones nearby (`theory_creation`, `created_theories`).
+                        See NOVELTY_RESULTS.md for the phase transition this
+                        produces at novelty_weight ≈ 0.5.
 """
 module TheorySandpile
 
@@ -45,6 +62,7 @@ export Scientist, theory_sandpile, run_field!, warmup!,
 # threshold must be at least that big.
 const NEIGHBOR_OFFSETS = ((1, 0), (-1, 0), (0, 1), (0, -1))
 const SHED = length(NEIGHBOR_OFFSETS)
+const DRIVES = (:uniform, :avoid_crowded, :matthew, :frontier, :novelty)
 
 """
     Scientist
@@ -68,8 +86,11 @@ mutable struct Field
     threshold::Int          # z_c: scientists a theory absorbs before toppling
     credit_slots::Int       # how many arrivals at a theory earn any credit
     credit_decay::Float64   # kth earner gets credit_decay^k
-    drive::Symbol           # :uniform | :avoid_crowded | :matthew | :frontier
+    drive::Symbol           # :uniform | :avoid_crowded | :matthew | :frontier | :novelty
     sample::Int             # how many theories a new scientist compares
+    novelty_weight::Float64 # :novelty only — 0 = crowd-avoidance, 1 = strong novelty bias
+    novelty_bonus::Float64  # :novelty only — extra credit for an undeveloped theory's first arrival
+    theory_creation::Bool   # :novelty only — let toppling spawn new theories nearby
     visits::Matrix{Int}     # cumulative arrivals per theory, all time
     clock::Int
     record::Bool
@@ -80,22 +101,18 @@ mutable struct Field
     radii::Vector{Int}
     seeds::Vector{Tuple{Int,Int}}
     left_field::Int         # scientists dissipated at the boundary
+    created_theories::Int   # :novelty only — theories spawned by toppling
 end
 
 # ---------------------------------------------------------------- construction
 
 """
-    theory_sandpile(; L, threshold, credit_slots, credit_decay, drive, sample, seed)
+    theory_sandpile(; L, threshold, credit_slots, credit_decay, drive, sample,
+                      novelty_weight, novelty_bonus, theory_creation, seed)
 
-Build the model.  `drive` picks the entry rule for new scientists:
-
-  * `:uniform`        — classic BTW driving: a scientist starts anywhere.
-  * `:avoid_crowded`  — compares `sample` theories, takes the least worked one
-                        (priority credit makes crowded theories worthless).
-  * `:matthew`        — the opposite: joins the most crowded of `sample`
-                        theories.  Hot topics attract more people.
-  * `:frontier`       — looks for an undeveloped theory adjacent to a developed
-                        one, i.e. works the edge of what is known.
+Build the model.  `drive` picks the entry rule for new scientists — see the
+module docstring for the five options. `novelty_weight`, `novelty_bonus`, and
+`theory_creation` only take effect when `drive == :novelty`.
 """
 function theory_sandpile(; L::Int = 32,
                            threshold::Int = 4,
@@ -103,16 +120,20 @@ function theory_sandpile(; L::Int = 32,
                            credit_decay::Float64 = 0.5,
                            drive::Symbol = :uniform,
                            sample::Int = 5,
+                           novelty_weight::Float64 = 0.5,
+                           novelty_bonus::Float64 = 1.0,
+                           theory_creation::Bool = true,
                            seed::Int = 42)
     threshold ≥ SHED || throw(ArgumentError(
         "threshold must be ≥ $SHED, the number of neighbours a topple feeds"))
-    drive in (:uniform, :avoid_crowded, :matthew, :frontier) ||
-        throw(ArgumentError("unknown drive rule $drive"))
+    drive in DRIVES || throw(ArgumentError("unknown drive rule $drive"))
+    0 ≤ novelty_weight ≤ 1 || throw(ArgumentError("novelty_weight must be in [0,1]"))
 
     space = GridSpace((L, L); periodic = false, metric = :manhattan)
     field = Field(L, threshold, credit_slots, credit_decay, drive, sample,
+                  novelty_weight, novelty_bonus, theory_creation,
                   zeros(Int, L, L), 0, false,
-                  Int[], Int[], Int[], Int[], Tuple{Int,Int}[], 0)
+                  Int[], Int[], Int[], Int[], Tuple{Int,Int}[], 0, 0)
 
     return StandardABM(Scientist, space;
                        model_step! = field_step!,
@@ -156,12 +177,17 @@ end
     arrive!(agent, pos, model; move = true)
 
 Put `agent` to work on the theory at `pos`, awarding priority credit if the
-theory still has an unclaimed credit slot, and time-stamping the arrival.
+theory still has an unclaimed credit slot (plus a novelty bonus for its very
+first arrival under the `:novelty` drive), and time-stamping the arrival.
 """
 function arrive!(agent, pos, model; move::Bool = true)
     v = model.visits[pos[1], pos[2]]
     if v < model.credit_slots
-        agent.credit += model.credit_decay^v
+        credit_earned = model.credit_decay^v
+        if model.drive === :novelty && v == 0 && model.novelty_weight > 0
+            credit_earned += model.novelty_weight * model.novelty_bonus
+        end
+        agent.credit += credit_earned
     end
     model.visits[pos[1], pos[2]] = v + 1
     model.clock += 1
@@ -180,6 +206,16 @@ function field_neighbors(model, pos)
     return qs
 end
 
+"Neighbouring theories of `pos` that are inside the field and undeveloped."
+function empty_neighbors(model, pos)
+    qs = Tuple{Int,Int}[]
+    for d in NEIGHBOR_OFFSETS
+        q = (pos[1] + d[1], pos[2] + d[2])
+        inside(model, q) && model.visits[q[1], q[2]] == 0 && push!(qs, q)
+    end
+    return qs
+end
+
 "Where does the next scientist start?  See `theory_sandpile` for the rules."
 function choose_theory(model)
     model.drive === :uniform && return random_position(model)
@@ -191,12 +227,19 @@ function choose_theory(model)
         return argmin(crowd, cands)
     elseif model.drive === :matthew
         return argmax(crowd, cands)
-    else # :frontier
+    elseif model.drive === :frontier
         for p in cands
             model.visits[p[1], p[2]] == 0 || continue
             any(q -> model.visits[q[1], q[2]] > 0, field_neighbors(model, p)) && return p
         end
         return first(cands)   # no frontier in sight: fall back to uniform
+    else # :novelty — continuous interpolation, see module docstring
+        if model.novelty_weight < 0.5
+            return argmin(crowd, cands)
+        else
+            score(p) = (model.visits[p[1], p[2]] == 0 ? 0 : 1, occupancy(model, p))
+            return argmin(score, cands)
+        end
     end
 end
 
@@ -207,6 +250,10 @@ The theory at `pos` has absorbed all the workers it can. Its `SHED` most
 recent arrivals move on, one into each adjacent theory. The earlier arrivals
 keep their claim and stay. A scientist pushed off the edge of the field has
 left research altogether.
+
+Under `:novelty` with `theory_creation` on, a saturating theory may also seed
+brand-new theories in its still-undeveloped neighbours — the "adjacent
+possible" — with probability `0.2 * novelty_weight` per empty neighbour.
 """
 function topple!(model, pos)
     # copy: the space is mutated below, so we must not hold its internal vector
@@ -221,6 +268,15 @@ function topple!(model, pos)
         else
             model.left_field += 1
             remove_agent!(agent, model)
+        end
+    end
+
+    if model.drive === :novelty && model.theory_creation && model.novelty_weight > 0.2
+        for q in empty_neighbors(model, pos)
+            if rand(abmrng(model)) < 0.2 * model.novelty_weight
+                model.visits[q[1], q[2]] = 1
+                model.created_theories += 1
+            end
         end
     end
     return nothing
@@ -392,8 +448,10 @@ function summarize(model)
     tau_mle, n = mle_exponent(s, 4)
     tau_fit = -loglog_slope(binned, 4, model.L^2 / 4)
 
-    println("=== drive=:", model.drive, "  L=", model.L,
-            "  z_c=", model.threshold, " ===")
+    label = model.drive === :novelty ?
+        "drive=:novelty (novelty_weight=$(model.novelty_weight))" :
+        "drive=:$(model.drive)"
+    println("=== ", label, "  L=", model.L, "  z_c=", model.threshold, " ===")
     @printf("  stationary density   : %.3f scientists/theory  (2D BTW ref ≈ 2.125)\n", density(model))
     @printf("  active steps         : %d/%d = %.3f\n", length(active), length(s), activity(model))
     if !isempty(active)
@@ -406,6 +464,7 @@ function summarize(model)
     @printf("  theories ever worked : %d/%d\n", n_developed(model), model.L^2)
     @printf("  scientists in field  : %d   (left the field: %d)\n", nagents(model), model.left_field)
     @printf("  credit: mean %.2f, Gini %.3f\n", mean_credit(model), gini_credit(model))
+    model.drive === :novelty && @printf("  theories created     : %d\n", model.created_theories)
     ascii_loglog(binned)
     return nothing
 end

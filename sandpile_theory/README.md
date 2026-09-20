@@ -8,15 +8,23 @@ check whether the result is actually critical.
 julia --project=. -e 'using Pkg; Pkg.instantiate()'
 julia --project=. run_demo.jl            # L=32, ~1–2 min
 julia --project=. run_demo.jl 16 5000 20000   # smaller/faster
+
+pip install numpy pandas matplotlib powerlaw
+python3 analyze.py                       # ANALYSIS.md, figures/, results_*.csv
+python3 make_video.py :novelty 0.7       # theory_field.gif — the field evolving over time
 ```
 
 Files:
 
 | file | what it is |
 |---|---|
-| `TheorySandpile.jl` | the model + the analysis functions |
-| `run_demo.jl` | control run, the four driving rules, finite-size scaling |
-| `validate_reference.py` | the same rules in dependency-free Python, used as a cross-check |
+| `TheorySandpile.jl` | the model + the analysis functions, all five drive rules (`:uniform`, `:avoid_crowded`, `:matthew`, `:frontier`, `:novelty`) |
+| `run_demo.jl` | control run, the drive-rule comparison, the novelty_weight sweep, finite-size scaling |
+| `validate_reference.py` | the same rules in dependency-free Python, used as a cross-check — also what `analyze.py` and `make_video.py` run against |
+| `analyze.py` | rigorous statistical analysis (power-law / truncated-power-law / lognormal fits via the `powerlaw` package) → `ANALYSIS.md`, `figures/*.png`, `results_*.csv` |
+| `make_video.py` | renders an animated GIF of the field evolving step by step |
+| `ANALYSIS.md` | the generated report — read this for the numbers, not the summary below |
+| `NOVELTY_RESULTS.md` | the original by-hand novelty-seeking writeup; superseded in rigor by `ANALYSIS.md` but kept for the narrative |
 
 ---
 

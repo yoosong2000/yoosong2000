@@ -74,6 +74,26 @@ for drive in (:uniform, :avoid_crowded, :matthew, :frontier)
 end
 
 # ---------------------------------------------------------------------------
+# 2b. Novelty-seeking sweep: does τ change as new-scientist behaviour moves
+#     continuously from crowd-avoidance (novelty_weight=0) to strong novelty
+#     bias (novelty_weight=1)?  See NOVELTY_RESULTS.md for the phase
+#     transition this produces at novelty_weight ≈ 0.5.
+# ---------------------------------------------------------------------------
+println("\n############  novelty-seeking sweep (drive=:novelty)  ############\n")
+println("novelty_w  density  activity   <s>    τ_fit  theories_created")
+println("─" ^ 62)
+for nw in 0.0:0.1:1.0
+    model = theory_sandpile(; L = L, drive = :novelty, novelty_weight = nw,
+                              seed = Int(round(100 + nw * 100)))
+    run_field!(model; warmup = WARMUP, measure = MEASURE)
+    active = filter(>(0), model.sizes)
+    tau = -loglog_slope(logbin(model.sizes), 4, L^2 / 4)
+    @printf("   %.1f      %.3f    %.3f   %6.1f  %6.3f       %d\n",
+            nw, density(model), activity(model),
+            isempty(active) ? 0.0 : mean(active), tau, model.created_theories)
+end
+
+# ---------------------------------------------------------------------------
 # 3. Finite-size scaling.  A power law with a cutoff that moves with L is the
 #    real signature of criticality; a power law at one L alone proves nothing.
 # ---------------------------------------------------------------------------

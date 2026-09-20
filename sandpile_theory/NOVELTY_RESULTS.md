@@ -6,11 +6,11 @@ The extended model demonstrates a **critical phase transition** as novelty-seeki
 
 ## Experimental Setup
 
-- **Model:** TheorySandpileNovelty.jl with `novelty_weight` ∈ [0, 1]
+- **Model:** TheorySandpile.jl, `drive=:novelty` with `novelty_weight` ∈ [0, 1]
 - **Parameter sweep:** 11 points from 0.0 to 1.0, in increments of 0.1
 - **Grid:** L = 24 (576 theories)
 - **Protocol:** 10k warmup + 30k measured steps, seeded reproducibly
-- **Cross-check:** Python reference implementation (validate_novelty_v2.py)
+- **Cross-check:** `validate_reference.py`'s `novelty_sweep()` function
 
 ## Key Findings
 
@@ -93,4 +93,4 @@ The critical state is not *prevented* by novelty-seeking; it is *enabled* by it.
 
 ---
 
-**Code:** TheorySandpileNovelty.jl, run_novelty_sweep.jl, validate_novelty_v2.py
+**Code:** `TheorySandpile.jl` (`drive=:novelty`), `run_demo.jl`, `validate_reference.py`
