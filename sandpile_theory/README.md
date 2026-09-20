@@ -22,7 +22,8 @@ Files:
 | `run_demo.jl` | control run, the drive-rule comparison, the novelty_weight sweep, finite-size scaling |
 | `validate_reference.py` | the same rules in dependency-free Python, used as a cross-check — also what `analyze.py` and `make_video.py` run against |
 | `analyze.py` | rigorous statistical analysis (power-law / truncated-power-law / lognormal fits via the `powerlaw` package) → `ANALYSIS.md`, `figures/*.png`, `results_*.csv` |
-| `make_video.py` | renders an animated GIF of the field evolving step by step |
+| `make_video.py` | renders an animated GIF of the field evolving step by step (Python side, no ffmpeg available in the dev container this was built in) |
+| `make_video.jl` | same idea, native Agents.jl/Makie `abmvideo` — real MP4 via Makie's bundled `FFMPEG_jll`, no system ffmpeg needed. **Written but not executed** — see the caveat at the top of the file |
 | `ANALYSIS.md` | the generated report — read this for the numbers, not the summary below |
 | `NOVELTY_RESULTS.md` | the original by-hand novelty-seeking writeup; superseded in rigor by `ANALYSIS.md` but kept for the narrative |
 
