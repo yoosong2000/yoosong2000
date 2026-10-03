@@ -1,0 +1,858 @@
+<title>The Theory Sandpile</title>
+<style>
+/* ----------------------------------------------------------------------
+   Layout concept: a lab-notebook / graph-paper reading surface. The whole
+   page sits on a faint square grid (the lattice the model itself runs on),
+   long-form sections read like notebook entries, data appears in monospace,
+   and the two research findings (criticality, novelty-seeking) each carry
+   their own accent color used consistently in prose, cards, and charts.
+   ------------------------------------------------------------------------ */
+:root {
+  --bg: #F2F4F1;
+  --surface: #FCFDFB;
+  --fg: #182019;
+  --muted: #5B675F;
+  --accent: #C97A1E;   /* avalanche / criticality */
+  --accent2: #2C7A72;  /* novelty-seeking / scientists */
+  --border: #D7DBD3;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111612;
+    --surface: #171E19;
+    --fg: #E7ECE5;
+    --muted: #93A398;
+    --accent: #E8A33D;
+    --accent2: #4FB3A4;
+    --border: #2B332C;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111612;
+  --surface: #171E19;
+  --fg: #E7ECE5;
+  --muted: #93A398;
+  --accent: #E8A33D;
+  --accent2: #4FB3A4;
+  --border: #2B332C;
+  color-scheme: dark;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+* { box-sizing: border-box; }
+body {
+  background:
+    linear-gradient(var(--bg), var(--bg)),
+    repeating-linear-gradient(0deg, color-mix(in srgb, var(--fg) 5%, transparent) 0 1px, transparent 1px 32px),
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--fg) 5%, transparent) 0 1px, transparent 1px 32px);
+  color: var(--fg);
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+  padding: 0 20px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 760px; margin: 0 auto; }
+.wide { max-width: 980px; margin: 0 auto; }
+
+h1, h2, h3 { font-family: "IBM Plex Serif", Georgia, serif; font-weight: 600; text-wrap: balance; line-height: 1.2; }
+h1 { font-size: clamp(2rem, 5vw, 2.9rem); margin: 0 0 .3em; letter-spacing: -0.01em; }
+h2 { font-size: clamp(1.4rem, 3vw, 1.8rem); margin: 2.6em 0 .6em; padding-top: .4em; border-top: 1px solid var(--border); }
+h3 { font-size: 1.15rem; margin: 1.6em 0 .5em; }
+p { line-height: 1.65; margin: 0 0 1em; max-width: 68ch; }
+.lede { font-size: 1.15rem; color: var(--muted); max-width: 56ch; }
+a { color: var(--accent2); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+a:hover { text-decoration-thickness: 2px; }
+code, .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+small, .cap { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: .74rem; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.num { font-variant-numeric: tabular-nums; }
+
+/* -------------------------------------------------------------- header */
+header.top {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--border);
+  margin: 0 -20px;
+}
+.topbar {
+  max-width: 980px; margin: 0 auto; padding: 12px 20px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.topbar .name { font-family: "IBM Plex Serif", serif; font-weight: 600; font-size: 1rem; }
+.topbar .name .dot { color: var(--accent); }
+details.toc { position: relative; }
+details.toc summary {
+  list-style: none; cursor: pointer; font-family: "IBM Plex Mono", monospace;
+  font-size: .78rem; letter-spacing: .04em; text-transform: uppercase;
+  color: var(--muted); border: 1px solid var(--border); border-radius: 4px;
+  padding: 6px 10px; user-select: none;
+}
+details.toc summary::-webkit-details-marker { display: none; }
+details.toc summary:hover { color: var(--fg); border-color: var(--muted); }
+details.toc[open] summary { color: var(--fg); }
+.toc-panel {
+  position: absolute; right: 0; top: calc(100% + 6px);
+  background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+  padding: 10px; width: 230px; max-width: 76vw;
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--fg) 14%, transparent);
+}
+.toc-panel a { display: block; padding: 6px 8px; border-radius: 4px; color: var(--fg); font-size: .88rem; }
+.toc-panel a:hover { background: color-mix(in srgb, var(--accent2) 12%, transparent); text-decoration: none; }
+.toc-panel .n { color: var(--muted); font-family: "IBM Plex Mono", monospace; font-size: .72rem; margin-right: .5em; }
+
+/* --------------------------------------------------------------- hero */
+.hero { padding: 48px 0 8px; }
+.hero .cap { color: var(--accent2); }
+.hero-grid {
+  display: grid; grid-template-columns: 1.1fr 1fr; gap: 36px; align-items: center;
+  max-width: 980px; margin: 0 auto;
+}
+@media (max-width: 760px) { .hero-grid { grid-template-columns: 1fr; } }
+
+.sim-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  padding: 14px; min-width: 0;
+}
+.sim-card canvas { width: 100%; height: auto; display: block; border-radius: 4px; background: var(--bg); }
+.sim-controls { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.sim-btn {
+  font-family: "IBM Plex Mono", monospace; font-size: .74rem; letter-spacing: .02em;
+  padding: 6px 10px; border-radius: 4px; border: 1px solid var(--border);
+  background: transparent; color: var(--muted); cursor: pointer;
+}
+.sim-btn:hover { color: var(--fg); }
+.sim-btn[aria-pressed="true"] { background: var(--accent2); border-color: var(--accent2); color: var(--surface); }
+.sim-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; margin-top: 10px;
+  font-family: "IBM Plex Mono", monospace; font-size: .72rem; color: var(--muted);
+}
+.sim-stats b { display: block; font-size: 1rem; color: var(--fg); font-weight: 500; }
+.sim-note { margin-top: 8px; font-size: .78rem; color: var(--muted); }
+.sim-note .flash { color: var(--accent); }
+
+/* ------------------------------------------------------------- generic */
+.section { padding: 8px 0; }
+.rule { height: 1px; background: var(--border); margin: 2.6em 0; border: 0; }
+
+table { border-collapse: collapse; width: 100%; font-size: .92rem; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+th { font-family: "IBM Plex Mono", monospace; font-size: .72rem; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+td.mono, th.mono { font-family: "IBM Plex Mono", monospace; }
+.table-wrap { overflow-x: auto; margin: 1.2em 0; border: 1px solid var(--border); border-radius: 8px; }
+.table-wrap table { margin: 0; }
+.table-wrap th, .table-wrap td { border-bottom: 1px solid var(--border); white-space: nowrap; }
+.table-wrap tr:last-child td { border-bottom: none; }
+
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin: 1.4em 0; }
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px;
+  min-width: 0;
+}
+.card .tag {
+  display: inline-block; font-family: "IBM Plex Mono", monospace; font-size: .72rem;
+  padding: 2px 8px; border-radius: 999px; margin-bottom: 10px;
+}
+.card.c-crit .tag { background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); }
+.card.c-nov .tag { background: color-mix(in srgb, var(--accent2) 16%, transparent); color: var(--accent2); }
+.card.c-neutral .tag { background: color-mix(in srgb, var(--muted) 16%, transparent); color: var(--muted); }
+.card h3 { margin: 0 0 6px; font-size: 1.02rem; }
+.card p { font-size: .9rem; color: var(--muted); margin: 0; }
+.card p b { color: var(--fg); font-weight: 500; }
+
+.chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 18px; margin: 1.4em 0; }
+.chart-card svg { width: 100%; height: auto; display: block; }
+.chart-card .chart-title { font-size: .86rem; font-weight: 500; margin-bottom: 2px; }
+.chart-card .chart-sub { font-size: .78rem; color: var(--muted); margin-bottom: 10px; }
+.chart-legend { display: flex; gap: 16px; margin-top: 8px; flex-wrap: wrap; }
+.chart-legend span { font-family: "IBM Plex Mono", monospace; font-size: .74rem; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+
+.code-block {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  overflow: hidden; margin: 1.2em 0; min-width: 0;
+}
+.code-block .bar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 7px 12px; border-bottom: 1px solid var(--border);
+  font-family: "IBM Plex Mono", monospace; font-size: .72rem; color: var(--muted);
+}
+.code-block pre {
+  margin: 0; padding: 14px; overflow-x: auto; font-family: "IBM Plex Mono", monospace;
+  font-size: .84rem; line-height: 1.6; color: var(--fg);
+}
+.copy-btn {
+  font-family: "IBM Plex Mono", monospace; font-size: .7rem; letter-spacing: .03em;
+  background: transparent; border: 1px solid var(--border); border-radius: 4px;
+  padding: 3px 8px; color: var(--muted); cursor: pointer;
+}
+.copy-btn:hover { color: var(--fg); }
+.copy-btn[data-copied="true"] { color: var(--accent2); border-color: var(--accent2); }
+
+.qlist { list-style: none; padding: 0; margin: 1.2em 0; display: grid; gap: 10px; }
+.qlist li {
+  display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start;
+  padding: 12px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+}
+.qlist .qmark { font-family: "IBM Plex Serif", serif; font-style: italic; color: var(--accent2); font-size: 1.1rem; line-height: 1.4; }
+.qlist p { margin: 0; font-size: .92rem; }
+
+.refs { columns: 1; margin: 1em 0; }
+.refs .refgroup { margin-bottom: 1.4em; break-inside: avoid; }
+.refs .refgroup h3 { margin: 0 0 .6em; font-size: .95rem; color: var(--muted); font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: .04em; font-weight: 500; }
+.refs ul { margin: 0; padding-left: 0; list-style: none; display: grid; gap: .55em; }
+.refs li { font-size: .88rem; line-height: 1.5; padding-left: 1.1em; text-indent: -1.1em; }
+
+.pill-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 1em 0; }
+.pill { font-family: "IBM Plex Mono", monospace; font-size: .76rem; border: 1px solid var(--border); border-radius: 999px; padding: 4px 11px; color: var(--muted); }
+
+footer { margin: 4em 0 3em; padding-top: 2em; border-top: 1px solid var(--border); }
+footer p { font-size: .84rem; color: var(--muted); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+
+@media (prefers-reduced-motion: reduce) { * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; } }
+</style>
+
+<header class="top">
+  <div class="topbar">
+    <span class="name">theory<span class="dot">·</span>sandpile</span>
+    <details class="toc">
+      <summary>Contents</summary>
+      <div class="toc-panel">
+        <a href="#soc"><span class="n">01</span>Self-organized criticality</a>
+        <a href="#mapping"><span class="n">02</span>Theories as a sandpile</a>
+        <a href="#rules"><span class="n">03</span>Five ways to choose a topic</a>
+        <a href="#avalanches"><span class="n">04</span>Avalanche features</a>
+        <a href="#finding"><span class="n">05</span>The novelty transition</a>
+        <a href="#questions"><span class="n">06</span>Research questions</a>
+        <a href="#run"><span class="n">07</span>Running it yourself</a>
+        <a href="#tooling"><span class="n">08</span>Tooling notes</a>
+        <a href="#refs"><span class="n">09</span>References</a>
+      </div>
+    </details>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <p class="cap">A tutorial · self-organized criticality as a model of research</p>
+    <h1>The Theory&nbsp;Sandpile</h1>
+    <p class="lede">A 1987 model of sand grains and avalanches, built with Agents.jl and
+    re-read one line at a time: a grid cell is a <b style="color:var(--fg)">theory</b>,
+    a grain is a <b style="color:var(--fg)">scientist</b>, and an avalanche is a
+    <b style="color:var(--fg)">research cascade</b> — one more worker setting off a chain
+    of theories taken up in sequence.</p>
+  </section>
+
+  <div class="wide">
+    <div class="hero-grid">
+      <div>
+        <p>Below is that exact rule set, running live in your browser: a 22×22 field,
+        one new scientist arriving at a time, redistributing to neighboring theories
+        whenever a theory saturates. No two runs look alike — but given enough time,
+        every run drifts to the same crowding, independent of where it started. That
+        drift, with nothing tuning it, is the entire subject of this page.</p>
+        <p>Switch the rule for <em>how a new scientist picks a topic</em> and watch the
+        texture of the avalanches change — that comparison is the model's main result,
+        explained in full further down.</p>
+      </div>
+      <div class="sim-card">
+        <canvas id="simCanvas" width="360" height="360" role="img" aria-label="Live sandpile simulation"></canvas>
+        <div class="sim-controls" role="group" aria-label="Topic-choice rule">
+          <button class="sim-btn" data-mode="uniform" aria-pressed="true">uniform</button>
+          <button class="sim-btn" data-mode="crowd" aria-pressed="false">avoid crowds</button>
+          <button class="sim-btn" data-mode="novelty" aria-pressed="false">seek novelty</button>
+        </div>
+        <div class="sim-stats">
+          <div>steps<b class="num" id="statSteps">0</b></div>
+          <div>last avalanche<b class="num" id="statLast">0</b></div>
+          <div>largest so far<b class="num" id="statMax">0</b></div>
+          <div>developed<b class="num" id="statDev">0%</b></div>
+        </div>
+        <p class="sim-note">Amber = a theory mid-avalanche. <span class="flash">Darker teal = more scientists currently on it.</span></p>
+      </div>
+    </div>
+  </div>
+
+  <section class="section wrap" id="soc">
+    <h2>01 · What self-organized criticality is</h2>
+    <p>An ordinary critical point is something you have to tune to. Heat a magnet and
+    it's ordered below its critical temperature, disordered above — and exactly at that
+    one temperature, fluctuations stop having a characteristic size. That's a single,
+    precisely-tuned point in the space of possible temperatures.</p>
+    <p><b>Self-organized criticality</b> (Bak, Tang &amp; Wiesenfeld, 1987) is the claim
+    that certain systems reach that same scale-free state <em>without</em> anyone tuning
+    anything — because the critical state is where the dynamics settle on their own, not
+    a special value of a parameter. Four ingredients make it happen:</p>
+    <ol>
+      <li><b>Slow drive</b> — stress is added gradually (one grain, one scientist, at a time).</li>
+      <li><b>A threshold</b> — nothing happens locally until a cell holds too much, then it relaxes and pushes the excess outward.</li>
+      <li><b>Fast relaxation</b> — the cascade this triggers finishes completely before the next grain arrives. This separation of timescales is what makes "an avalanche" a well-defined, countable thing.</li>
+      <li><b>Conservation with a boundary leak</b> — nothing is created or destroyed inside the system; it only ever leaves at the edges.</li>
+    </ol>
+    <p>That last ingredient does the real work. Below the critical density, input piles up
+    faster than it can leave, so the density <em>rises</em>. Above it, avalanches become so
+    easy to trigger that too much leaves at once, so the density <em>falls</em>. The fixed
+    point of that feedback loop is exact marginal stability — a system perpetually one grain
+    away from a cascade of any size.</p>
+    <p>The signature this leaves behind is a power law with no characteristic scale:</p>
+    <div class="code-block"><div class="bar"><span>scaling form</span></div>
+      <pre>P(s) ~ s<sup>&minus;τ</sup> · G(s / L<sup>D</sup>)</pre>
+    </div>
+    <p>— avalanche sizes distributed across every scale up to the system size <code>L</code>,
+    with a cutoff that has to <em>move with</em> <code>L</code>. A power law measured at one
+    grid size alone proves very little; that is exactly why the finding in §05 is checked
+    at several system sizes rather than just one.</p>
+    <p style="color:var(--muted); font-size:.9rem;">A caution worth carrying into §05:
+    SOC is a narrower claim than "I found a power law." Lognormal distributions,
+    preferential attachment, and plain bad binning all produce something that looks
+    power-law-shaped on a bad plot. Clauset, Shalizi &amp; Newman (2009) is the standard
+    fix, and it is the method this page's own numbers were checked against.</p>
+  </section>
+
+  <section class="section wrap" id="mapping">
+    <h2>02 · Theories as a sandpile</h2>
+    <p>The Bak–Tang–Wiesenfeld rule, unmodified: a square grid, each cell holding some
+    number of grains. Add a grain to a random cell. Any cell holding four or more sheds
+    one grain to each of its four neighbors. Grains that fall off the edge are gone.
+    Repeat the shedding until every cell is stable, then add the next grain.</p>
+    <p>Nothing about that needs sand. Read the same five rules as a model of who works
+    on what:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>sandpile</th><th>this model</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">cell</td><td>a theory</td></tr>
+          <tr><td class="mono">grid edge</td><td>two theories close enough that work on one carries into the other</td></tr>
+          <tr><td class="mono">grain</td><td>a scientist currently working on that theory</td></tr>
+          <tr><td class="mono">z<sub>c</sub> = 4</td><td>how many scientists a theory absorbs before it's considered worked out</td></tr>
+          <tr><td class="mono">toppling</td><td>the theory saturates; its newest arrivals spill into adjacent, bridging theories</td></tr>
+          <tr><td class="mono">avalanche</td><td>a research cascade — one more worker sets off a chain of theories taken up in sequence</td></tr>
+          <tr><td class="mono">boundary loss</td><td>scientists who leave the field</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Two additions the sand never needed:</p>
+    <p><b>Development is irreversible.</b> A count of every arrival a theory has <em>ever</em>
+    had, not just its current occupancy — unlike sand height, this number never goes down.
+    A theory is "developed" the moment that count passes zero.</p>
+    <p><b>Priority credit.</b> The first few scientists to arrive at a theory bank
+    <code>decay<sup>k</sup></code> credit each; everyone after them banks nothing. This is
+    what gives a theory a real capacity: not a physical limit, but the fact that staying
+    past the first few arrivals stops paying. When a theory does saturate, it's the
+    <em>latest</em> arrivals who move on — the earliest keep their claim and stay, which
+    is exactly BTW's four-grains-out arithmetic with a reason attached to which four.</p>
+  </section>
+
+  <section class="section wrap" id="rules">
+    <h2>03 · Five ways to choose a topic</h2>
+    <p>Everything above is fixed. The one open question is how a <em>new</em> scientist
+    picks where to start — and that single choice turns out to decide almost everything
+    about the avalanches that follow.</p>
+    <div class="card-grid">
+      <div class="card c-crit"><span class="tag">control</span>
+        <h3><code>:uniform</code></h3>
+        <p>Starts anywhere, no comparison at all. This <em>is</em> plain BTW — the
+        control every other rule is judged against.</p></div>
+      <div class="card c-nov"><span class="tag">your rule</span>
+        <h3><code>:avoid_crowded</code></h3>
+        <p>Samples a handful of theories, joins the least-worked one. Rational — credit
+        is already gone on a crowded theory — but as §05 shows, this is the rule that
+        <b>breaks</b> scale-free behavior.</p></div>
+      <div class="card c-neutral"><span class="tag">rich get richer</span>
+        <h3><code>:matthew</code></h3>
+        <p>The opposite: joins the <em>most</em> crowded of the sampled theories. Hot
+        topics attract more people, Merton's Matthew effect built directly into the
+        entry rule.</p></div>
+      <div class="card c-neutral"><span class="tag">adjacent possible</span>
+        <h3><code>:frontier</code></h3>
+        <p>Looks for an undeveloped theory sitting next to a developed one — working the
+        known edge outward, one bridging theory at a time.</p></div>
+      <div class="card c-nov"><span class="tag">the finding</span>
+        <h3><code>:novelty</code></h3>
+        <p>A continuous dial, <code>novelty_weight ∈ [0,1]</code>, from crowd-avoidance
+        up to an active preference for undeveloped theories, plus a small chance a
+        saturating theory spawns new ones beside it. This is the rule §05 is about.</p></div>
+    </div>
+  </section>
+
+  <section class="section wrap" id="avalanches">
+    <h2>04 · What an avalanche looks like from the inside</h2>
+    <p>Every cascade is logged as four numbers, every one of them meaningful on its own:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>feature</th><th>counts</th><th>reads as</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">size (s)</td><td>number of topples</td><td>total follow-on work the cascade triggered</td></tr>
+          <tr><td class="mono">duration (T)</td><td>parallel-update rounds</td><td>how many bridging-theory hops deep it went</td></tr>
+          <tr><td class="mono">area (a)</td><td>distinct theories touched</td><td>breadth, as opposed to size's willingness to revisit a hot theory repeatedly</td></tr>
+          <tr><td class="mono">radius (r)</td><td>max distance from the seed</td><td>a direct test of "a distant theory needs its bridges built first"</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The live simulation above is tracking exactly these numbers for every mode — try
+    switching from <code>uniform</code> to <code>avoid crowds</code> and watch
+    <em>largest so far</em> climb while the cascades themselves become rarer: fewer
+    avalanches, each one worse. That trade is the whole story of §05, before the numbers
+    get involved.</p>
+  </section>
+
+  <section class="section wrap" id="finding">
+    <h2>05 · The novelty-seeking transition</h2>
+    <p>Sweep <code>novelty_weight</code> from 0 to 1 — crowd-avoidance at one end,
+    active novelty-seeking plus a little new-theory creation at the other — and fit
+    the avalanche-size tail at each point with a truncated power law
+    (<code>s<sup>&minus;τ</sup>·e<sup>&minus;s/s<sub>max</sub></sup></code>), checked
+    against a lognormal alternative the way Clauset, Shalizi &amp; Newman (2009)
+    prescribe. 11 runs, grid size 24, 40,000 measured steps each, after a 15,000-step
+    warm-up discarded as transient.</p>
+  </section>
+
+  <div class="wide">
+    <div class="chart-card">
+      <div class="chart-title">Critical exponent τ vs. novelty-seeking weight</div>
+      <div class="chart-sub">Truncated power-law MLE, L=24 · dashed line marks the BTW reference τ≈1</div>
+      <svg id="chartTau" viewBox="0 0 640 220" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Chart of critical exponent dropping sharply at novelty weight 0.5"></svg>
+      <div class="chart-legend">
+        <span><i class="swatch" style="background:var(--accent2)"></i>τ (truncated power-law fit)</span>
+        <span><i class="swatch" style="background:var(--muted)"></i>BTW reference, τ≈1</span>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Mean avalanche size ⟨s⟩ vs. novelty-seeking weight</div>
+      <div class="chart-sub">Same 11 runs — the size jump mirrors the exponent drop</div>
+      <svg id="chartSize" viewBox="0 0 640 220" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Chart of mean avalanche size jumping up at novelty weight 0.5"></svg>
+      <div class="chart-legend">
+        <span><i class="swatch" style="background:var(--accent)"></i>⟨s⟩, mean avalanche size</span>
+      </div>
+    </div>
+  </div>
+
+  <section class="section wrap">
+    <p>The transition is a step, not a slope. Below <code>novelty_weight = 0.5</code>,
+    τ averages <b style="color:var(--fg)">0.91 ± 0.02</b>; at or above it, τ drops to
+    <b style="color:var(--fg)">0.52 ± 0.03</b> — and mean avalanche size roughly
+    <b style="color:var(--fg)">2.5×</b>s, from the 265–285 range up to 660–705. In both
+    regimes the truncated power law beats the lognormal alternative decisively
+    (log-likelihood ratio R &gt; 20, p &lt; 10<sup>&minus;100</sup>), so this isn't
+    "critical vs. not critical" in the crude sense — it's a real, large shift in
+    <em>how</em> critical, hinging on a single incentive.</p>
+    <p>Read the other way: a population of scientists who are individually and
+    rationally avoiding crowded theories does not produce smooth, scale-free research
+    cascades. It produces <em>rarer, more extreme</em> ones — an avalanche-size
+    distribution with a visible bump at large <code>s</code> instead of a clean cutoff,
+    the signature of a characteristic scale creeping back in. What pulls the field back
+    toward scale-free behavior is specifically the preference for <em>novel</em>
+    theories, not mere crowd-avoidance — the two look similar in a one-line description
+    and are opposites in what they do to the field.</p>
+  </section>
+
+  <section class="section wrap" id="questions">
+    <h2>06 · What this is, and isn't, good for asking</h2>
+    <p>This is a mechanism model: a fixed 2D lattice, a conserved population, no domain
+    content in what a "theory" actually contains. It's built to answer comparative and
+    structural questions, not to forecast a real field.</p>
+    <ul class="qlist">
+      <li><span class="qmark">&ldquo;</span><p><b>Mechanism sensitivity</b> — which features of the credit rule actually set the exponent? Is the transition at <code>novelty_weight ≈ 0.5</code> meaningful, or an artifact of this particular scoring function?</p></li>
+      <li><span class="qmark">&ldquo;</span><p><b>A falsifiable empirical claim</b> — real research bursts (citation cascades, a sudden crowd into a subfield) should show a truncated-power-law size distribution under novelty-seeking, and a bump-shaped, non-scale-free one under pure crowd-avoidance. That's checkable against bibliometric data.</p></li>
+      <li><span class="qmark">&ldquo;</span><p><b>Does the transition survive a realistic topology?</b> — theory space isn't a 2D grid. Rerun on a small-world or scale-free graph (<code>GraphSpace</code> in place of <code>GridSpace</code>) and see whether it washes out.</p></li>
+      <li><span class="qmark">&ldquo;</span><p><b>Heterogeneous populations</b> — what happens with a mixture of strategies in the same field at once, instead of one archetype at a time?</p></li>
+      <li><span class="qmark">&ldquo;</span><p><b>Is critical actually good?</b> — reframe from "is it critical" to "is there a <code>novelty_weight</code> that maximizes distinct theories developed per scientist-step," closer to what the welfare side of this literature actually argues about.</p></li>
+    </ul>
+    <p style="color:var(--muted); font-size:.9rem;">Not a good fit: predicting a
+    specific field's trajectory, dating a specific discovery, or treating the credit
+    numbers as real citation counts. The model has structure, not domain content.</p>
+  </section>
+
+  <section class="section wrap" id="run">
+    <h2>07 · Running it yourself</h2>
+    <p>The reference implementation is <a href="https://github.com/yoosong2000/yoosong2000/tree/claude/sandpile-theory-evolution-d4du7t/sandpile_theory">Agents.jl</a>,
+    cross-checked against a dependency-free Python port and analyzed with the
+    <code>powerlaw</code> package. Three entry points:</p>
+
+    <h3>Julia — the model itself</h3>
+    <div class="code-block">
+      <div class="bar"><span>terminal</span><button class="copy-btn" data-copy="julia --project=. -e 'using Pkg; Pkg.instantiate()'
+julia --project=. run_demo.jl">copy</button></div>
+      <pre>julia --project=. -e 'using Pkg; Pkg.instantiate()'
+julia --project=. run_demo.jl</pre>
+    </div>
+
+    <h3>Python — statistical analysis and the figures above</h3>
+    <div class="code-block">
+      <div class="bar"><span>terminal</span><button class="copy-btn" data-copy="pip install numpy pandas matplotlib powerlaw
+python3 analyze.py">copy</button></div>
+      <pre>pip install numpy pandas matplotlib powerlaw
+python3 analyze.py</pre>
+    </div>
+
+    <h3>A video of the field evolving</h3>
+    <div class="code-block">
+      <div class="bar"><span>terminal</span><button class="copy-btn" data-copy="python3 make_video.py :novelty 0.7">copy</button></div>
+      <pre>python3 make_video.py :novelty 0.7</pre>
+    </div>
+    <p style="color:var(--muted); font-size:.88rem;">A native Agents.jl/Makie version
+    (<code>make_video.jl</code>) ships alongside it, producing a true MP4 via Makie's
+    bundled <code>FFMPEG_jll</code> rather than the GIF fallback above — written and
+    reviewed, not yet run in an environment with a working Julia install.</p>
+  </section>
+
+  <section class="section wrap" id="tooling">
+    <h2>08 · Why Python for the analysis</h2>
+    <p>Checked directly rather than assumed: this project's environment has no R and no
+    Stata installed, only Python with <code>numpy</code>/<code>pandas</code>/<code>matplotlib</code>/<code>powerlaw</code>
+    available through pip. That's not really the deciding factor, though — R's
+    <code>poweRlaw</code> package is just as rigorous an implementation of the same
+    Clauset–Shalizi–Newman estimator. What decided it was the pipeline: the
+    cross-check simulation is already Python, so simulate → fit → plot → animate runs
+    in one process, one language, nothing shelled out.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th></th><th>Python</th><th>R</th><th>Stata</th></tr></thead>
+        <tbody>
+          <tr><td>power-law fitting</td><td><code>powerlaw</code> — full CSN(2009) MLE + KS test</td><td><code>poweRlaw</code> — equally rigorous</td><td>no native discrete power-law MLE</td></tr>
+          <tr><td>runs the cross-check sim</td><td>yes, already is</td><td>would need a rewrite</td><td>would need a rewrite</td></tr>
+          <tr><td>video output</td><td><code>matplotlib.animation</code>, no extra install</td><td>heavier dependency chain</td><td>not a video tool</td></tr>
+          <tr><td>cost</td><td>free</td><td>free</td><td>commercial license</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section wrap" id="refs">
+    <h2>09 · References</h2>
+    <p>A starting shelf — the full bibliography (60+ entries, including the
+    science-of-science literature behind the credit and topic-choice assumptions) lives
+    in the repository's <code>README.md</code> and <code>ANALYSIS.md</code>.</p>
+    <div class="refs">
+      <div class="refgroup">
+        <h3>Sandpiles &amp; SOC — the core</h3>
+        <ul>
+          <li>Bak, Tang, Wiesenfeld. <i>Self-organized criticality.</i> Phys. Rev. A 38, 364 (1988).</li>
+          <li>Dhar. <i>Self-organized critical state of sandpile automaton models.</i> PRL 64, 1613 (1990) — the Abelian property.</li>
+          <li>Pruessner. <i>Self-Organised Criticality.</i> Cambridge (2012) — the reference work on measuring exponents correctly.</li>
+        </ul>
+      </div>
+      <div class="refgroup">
+        <h3>Corrections worth knowing</h3>
+        <ul>
+          <li>Jensen, Christensen, Fogedby. <i>1/f noise, distribution of lifetimes, and a pile of sand.</i> PRB 40, 7425 (1989) — BTW gives 1/f², not 1/f.</li>
+          <li>Clauset, Shalizi, Newman. <i>Power-law distributions in empirical data.</i> SIAM Review 51, 661 (2009) — non-negotiable before claiming one.</li>
+        </ul>
+      </div>
+      <div class="refgroup">
+        <h3>Science as the thing being modeled</h3>
+        <ul>
+          <li>Kitcher. <i>The division of cognitive labor.</i> J. Philosophy 87, 5 (1990) — start here.</li>
+          <li>Merton. <i>The Matthew effect in science.</i> Science 159, 56 (1968).</li>
+          <li>Weisberg, Muldoon. <i>Epistemic landscapes and the division of cognitive labor.</i> Phil. Sci. 76, 225 (2009) — the closest existing ABM to this one.</li>
+          <li>Foster, Rzhetsky, Evans. <i>Tradition and innovation in scientists' research strategies.</i> ASR 80, 875 (2015) — measures the explore/exploit tradeoff §05 is about.</li>
+        </ul>
+      </div>
+      <div class="refgroup">
+        <h3>Tools used on this page</h3>
+        <ul>
+          <li>Datseris, Vahdati, DuBois. <i>Agents.jl.</i> SIMULATION 100, 1019 (2024).</li>
+          <li>Alstott, Bullmore, Plenz. <i>powerlaw: a Python package for analysis of heavy-tailed distributions.</i> PLoS ONE 9(1) (2014).</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="pill-row">
+      <span class="pill">Agents.jl</span>
+      <span class="pill">self-organized criticality</span>
+      <span class="pill">science of science</span>
+      <span class="pill">agent-based modeling</span>
+    </div>
+    <p>Companion tutorial to the Theory Sandpile project —
+    <a href="https://github.com/yoosong2000/yoosong2000/tree/claude/sandpile-theory-evolution-d4du7t/sandpile_theory">source and full write-up</a>
+    · <a href="https://github.com/yoosong2000/yoosong2000/pull/1">pull request</a>.
+    The live simulation above is a from-scratch reimplementation of the same rules for
+    the browser; the figures in §05 are generated from the actual Python/Julia
+    simulation runs, not illustrative.</p>
+  </footer>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------------------------------------------------------- live sandpile demo */
+  var canvas = document.getElementById("simCanvas");
+  var ctx = canvas.getContext("2d");
+  var L = 22, cell = canvas.width / L;
+  var occ, visits, developedCount, mode = "uniform";
+  var steps = 0, lastSize = 0, maxSize = 0;
+  var flashes = []; // {x,y,life}
+
+  function idx(x, y) { return y * L + x; }
+
+  function resetSim() {
+    occ = new Array(L * L).fill(0);
+    visits = new Array(L * L).fill(0);
+    developedCount = 0;
+    steps = 0; lastSize = 0; maxSize = 0;
+    flashes = [];
+  }
+  resetSim();
+
+  function neighbors(x, y) {
+    var out = [];
+    if (x > 0) out.push([x - 1, y]);
+    if (x < L - 1) out.push([x + 1, y]);
+    if (y > 0) out.push([x, y - 1]);
+    if (y < L - 1) out.push([x, y + 1]);
+    return out;
+  }
+  function randCell() {
+    return [Math.floor(Math.random() * L), Math.floor(Math.random() * L)];
+  }
+  function chooseCell() {
+    if (mode === "uniform") return randCell();
+    var k = 5, best = null, bestScore = Infinity;
+    for (var i = 0; i < k; i++) {
+      var c = randCell(), x = c[0], y = c[1];
+      var o = occ[idx(x, y)], v = visits[idx(x, y)], score;
+      if (mode === "crowd") score = o * 1000 + v;
+      else score = (v === 0 ? 0 : 1000) + o; // novelty
+      if (score < bestScore) { bestScore = score; best = c; }
+    }
+    return best;
+  }
+  function arrive(x, y) {
+    var i = idx(x, y);
+    if (visits[i] === 0) developedCount++;
+    visits[i]++;
+    occ[i]++;
+  }
+  function relax(sx, sy) {
+    var size = 0;
+    var queue = [[sx, sy]];
+    var inQueue = {}; inQueue[idx(sx, sy)] = true;
+    while (queue.length) {
+      var cur = queue.shift(), x = cur[0], y = cur[1];
+      delete inQueue[idx(x, y)];
+      if (occ[idx(x, y)] < 4) continue;
+      occ[idx(x, y)] -= 4;
+      size++;
+      flashes.push({ x: x, y: y, life: 1 });
+      var nb = neighbors(x, y);
+      for (var i = 0; i < nb.length; i++) {
+        var nx = nb[i][0], ny = nb[i][1];
+        arrive(nx, ny);
+        var ni = idx(nx, ny);
+        if (occ[ni] >= 4 && !inQueue[ni]) { queue.push([nx, ny]); inQueue[ni] = true; }
+      }
+      if (occ[idx(x, y)] >= 4 && !inQueue[idx(x, y)]) { queue.push([x, y]); inQueue[idx(x, y)] = true; }
+    }
+    return size;
+  }
+  function step() {
+    var c = chooseCell();
+    arrive(c[0], c[1]);
+    var size = relax(c[0], c[1]);
+    steps++; lastSize = size;
+    if (size > maxSize) maxSize = size;
+  }
+
+  var accentRGB = [201, 122, 30], accent2RGB = [44, 122, 114];
+  function readRGB(varName, fallback) {
+    var v = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+    var m = v.match(/^#([0-9a-f]{6})$/i);
+    if (!m) return fallback;
+    var hex = m[1];
+    return [parseInt(hex.slice(0,2),16), parseInt(hex.slice(2,4),16), parseInt(hex.slice(4,6),16)];
+  }
+
+  function draw() {
+    accentRGB = readRGB("--accent", accentRGB);
+    accent2RGB = readRGB("--accent2", accent2RGB);
+    var bg = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim() || "#fff";
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    for (var y = 0; y < L; y++) {
+      for (var x = 0; x < L; x++) {
+        var o = occ[idx(x, y)];
+        var t = Math.min(o / 3, 1);
+        var r = Math.round(bgChan(0) + (accent2RGB[0] - bgChan(0)) * t * 0.85);
+        var g = Math.round(bgChan(1) + (accent2RGB[1] - bgChan(1)) * t * 0.85);
+        var b = Math.round(bgChan(2) + (accent2RGB[2] - bgChan(2)) * t * 0.85);
+        ctx.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
+        ctx.fillRect(x * cell, y * cell, cell - 1, cell - 1);
+      }
+    }
+    for (var i = flashes.length - 1; i >= 0; i--) {
+      var f = flashes[i];
+      ctx.fillStyle = "rgba(" + accentRGB[0] + "," + accentRGB[1] + "," + accentRGB[2] + "," + f.life + ")";
+      ctx.fillRect(f.x * cell, f.y * cell, cell - 1, cell - 1);
+      f.life -= 0.12;
+      if (f.life <= 0) flashes.splice(i, 1);
+    }
+
+    function bgChan(ix) {
+      var m = bg.match(/^#([0-9a-f]{6})$/i);
+      if (!m) return 255;
+      var hex = m[1];
+      return parseInt(hex.slice(ix*2, ix*2+2), 16);
+    }
+
+    document.getElementById("statSteps").textContent = steps;
+    document.getElementById("statLast").textContent = lastSize;
+    document.getElementById("statMax").textContent = maxSize;
+    document.getElementById("statDev").textContent = Math.round(100 * developedCount / (L * L)) + "%";
+  }
+
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var stepsPerFrame = reduced ? 0 : 2;
+  var frameCount = 0;
+
+  function tick() {
+    for (var i = 0; i < stepsPerFrame; i++) step();
+    if (reduced && frameCount % 20 === 0) step();
+    frameCount++;
+    draw();
+    requestAnimationFrame(tick);
+  }
+  draw();
+  requestAnimationFrame(tick);
+
+  var buttons = document.querySelectorAll(".sim-btn");
+  buttons.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      mode = btn.getAttribute("data-mode");
+      buttons.forEach(function (b) { b.setAttribute("aria-pressed", b === btn ? "true" : "false"); });
+      resetSim();
+    });
+  });
+
+  /* ---------------------------------------------------------------- charts */
+  var novelty = [
+    { nw: 0.0, tau: 0.918, meanS: 269.8 },
+    { nw: 0.1, tau: 0.884, meanS: 282.9 },
+    { nw: 0.2, tau: 0.890, meanS: 280.8 },
+    { nw: 0.3, tau: 0.934, meanS: 265.1 },
+    { nw: 0.4, tau: 0.914, meanS: 281.4 },
+    { nw: 0.5, tau: 0.497, meanS: 705.1 },
+    { nw: 0.6, tau: 0.517, meanS: 670.9 },
+    { nw: 0.7, tau: 0.478, meanS: 686.9 },
+    { nw: 0.8, tau: 0.570, meanS: 665.3 },
+    { nw: 0.9, tau: 0.519, meanS: 687.3 },
+    { nw: 1.0, tau: 0.548, meanS: 663.1 }
+  ];
+
+  var NS = "http://www.w3.org/2000/svg";
+  function el(tag, attrs) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  function drawLineChart(svg, data, yKey, yDomain, color, refLine) {
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    var W = 640, H = 220, m = { l: 44, r: 16, t: 12, b: 28 };
+    var plotW = W - m.l - m.r, plotH = H - m.t - m.b;
+    var fg = getComputedStyle(document.documentElement).getPropertyValue("--fg").trim() || "#182019";
+    var muted = getComputedStyle(document.documentElement).getPropertyValue("--muted").trim() || "#5B675F";
+    var border = getComputedStyle(document.documentElement).getPropertyValue("--border").trim() || "#D7DBD3";
+
+    var xmin = 0, xmax = 1, ymin = yDomain[0], ymax = yDomain[1];
+    function px(x) { return m.l + ((x - xmin) / (xmax - xmin)) * plotW; }
+    function py(y) { return m.t + plotH - ((y - ymin) / (ymax - ymin)) * plotH; }
+
+    // transition band
+    svg.appendChild(el("rect", {
+      x: px(0.45), y: m.t, width: px(0.55) - px(0.45), height: plotH,
+      fill: color, opacity: "0.08"
+    }));
+
+    // gridlines + y ticks
+    var ticks = 4;
+    for (var i = 0; i <= ticks; i++) {
+      var yv = ymin + (ymax - ymin) * (i / ticks);
+      var yy = py(yv);
+      svg.appendChild(el("line", { x1: m.l, x2: W - m.r, y1: yy, y2: yy, stroke: border, "stroke-width": "1" }));
+      var t = el("text", { x: m.l - 8, y: yy + 3, "text-anchor": "end", "font-size": "10", "font-family": "IBM Plex Mono, monospace", fill: muted });
+      t.textContent = yv.toFixed(yKey === "tau" ? 1 : 0);
+      svg.appendChild(t);
+    }
+    // x ticks
+    [0, 0.25, 0.5, 0.75, 1.0].forEach(function (xv) {
+      var xx = px(xv);
+      var t = el("text", { x: xx, y: H - 8, "text-anchor": "middle", "font-size": "10", "font-family": "IBM Plex Mono, monospace", fill: muted });
+      t.textContent = xv.toFixed(2);
+      svg.appendChild(t);
+    });
+
+    if (refLine !== undefined) {
+      var ry = py(refLine);
+      var rl = el("line", { x1: m.l, x2: W - m.r, y1: ry, y2: ry, stroke: muted, "stroke-width": "1.3", "stroke-dasharray": "4 4" });
+      svg.appendChild(rl);
+    }
+
+    var pts = data.map(function (d) { return [px(d.nw), py(d[yKey])]; });
+    var pathD = pts.map(function (p, i) { return (i === 0 ? "M" : "L") + p[0].toFixed(1) + "," + p[1].toFixed(1); }).join(" ");
+    svg.appendChild(el("path", { d: pathD, fill: "none", stroke: color, "stroke-width": "2.5", "stroke-linejoin": "round", "stroke-linecap": "round" }));
+    pts.forEach(function (p) {
+      svg.appendChild(el("circle", { cx: p[0], cy: p[1], r: "3.5", fill: color }));
+    });
+
+    var axisLabel = el("text", { x: W / 2, y: H - 0, "text-anchor": "middle", "font-size": "10", "font-family": "IBM Plex Mono, monospace", fill: muted });
+    axisLabel.textContent = "novelty_weight";
+    // omit duplicate axis label to avoid overlapping x ticks on narrow screens
+  }
+
+  function renderCharts() {
+    drawLineChart(document.getElementById("chartTau"), novelty, "tau", [0.4, 1.0],
+      getComputedStyle(document.documentElement).getPropertyValue("--accent2").trim() || "#2C7A72", 1.0);
+    drawLineChart(document.getElementById("chartSize"), novelty, "meanS", [0, 800],
+      getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#C97A1E");
+  }
+  renderCharts();
+  window.addEventListener("resize", renderCharts);
+  if (window.matchMedia) {
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", renderCharts);
+  }
+
+  /* ------------------------------------------------------------- copy buttons */
+  document.querySelectorAll(".copy-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var text = btn.getAttribute("data-copy");
+      function done() {
+        btn.setAttribute("data-copied", "true");
+        var old = btn.textContent;
+        btn.textContent = "copied";
+        setTimeout(function () { btn.textContent = old; btn.removeAttribute("data-copied"); }, 1400);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(function () { fallbackCopy(text, done); });
+      } else {
+        fallbackCopy(text, done);
+      }
+    });
+  });
+  function fallbackCopy(text, cb) {
+    var ta = document.createElement("textarea");
+    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); } catch (e) {}
+    document.body.removeChild(ta);
+    cb();
+  }
+
+  /* ------------------------------------------------------- hot-reload hooks */
+  if (window.claude && window.claude.hot) {
+    window.claude.hot.snapshot(function () { return { mode: mode }; });
+    var start = function (data) {
+      if (data && data.mode) {
+        mode = data.mode;
+        buttons.forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-mode") === mode ? "true" : "false"); });
+      }
+    };
+    if (window.claude.hot.ready) window.claude.hot.ready(start); else start(window.claude.hot.data || {});
+  }
+})();
+</script>

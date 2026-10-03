@@ -26,6 +26,8 @@ Files:
 | `make_video.jl` | same idea, native Agents.jl/Makie `abmvideo` — real MP4 via Makie's bundled `FFMPEG_jll`, no system ffmpeg needed. **Written but not executed** — see the caveat at the top of the file |
 | `ANALYSIS.md` | the generated report — read this for the numbers, not the summary below |
 | `NOVELTY_RESULTS.md` | the original by-hand novelty-seeking writeup; superseded in rigor by `ANALYSIS.md` but kept for the narrative |
+| `tutorial.html` | an interactive, self-contained tutorial — a live in-browser reimplementation of the sandpile with a topic-choice-rule toggle, plus the SOC background, the mapping table, and the novelty-transition charts. Open the file directly, or see it published at <https://claude.ai/artifact/3dHFieeRjFspChFA39mG9j> |
+| `PHILOSOPHY.md` | what kind of philosophical research question this model is actually useful for (social epistemology of credit, aggregation failure, Kuhn's punctuated structure, emergence) — and where it has nothing to say (realism, belief-updating, strong incommensurability) |
 
 ---
 
