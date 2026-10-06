@@ -33,9 +33,10 @@ P(s) ~ s^-τ · G(s / L^D)
 
 Avalanche sizes distributed across every scale up to the system size `L`,
 with a cutoff that moves with `L`. A power law measured at one grid size
-alone proves little — see [[Truncated Power-Law Fitting]] for how this
-model checks it properly, and [[Novelty-Seeking Phase Transition]] for where
-that check actually mattered.
+alone proves little — see [[Finite-Size Scaling]] for this project's own
+check of that claim, [[Truncated Power-Law Fitting]] for how τ itself is
+fit properly, and [[Novelty-Seeking Phase Transition]] for where that check
+actually mattered.
 
 > [!warning] Not every power law is SOC
 > Lognormal distributions, preferential attachment, and plain bad binning

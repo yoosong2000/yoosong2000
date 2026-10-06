@@ -14,6 +14,14 @@ bibliography (60+ entries).
   64, 1613 (1990) — the Abelian property. — [[Bak-Tang-Wiesenfeld Sandpile]]
 - Pruessner. *Self-Organised Criticality.* Cambridge (2012) — the reference
   work on measuring exponents correctly.
+- Pegden, Smart. *Convergence of the Abelian sandpile.* Duke Math. J. 162,
+  627 (2013) — the deterministic fractal patterns, made rigorous. —
+  [[Known Sandpile Patterns]]
+- Frette et al. *Avalanche dynamics in a pile of rice.* Nature 379, 49
+  (1996) — SOC only for elongated grains. — [[Known Sandpile Patterns]]
+- Beggs, Plenz. *Neuronal avalanches in neocortical circuits.* J. Neurosci.
+  23, 11167 (2003) — the best-supported empirical SOC case. —
+  [[Known Sandpile Patterns]]
 
 ## Corrections worth knowing
 - Jensen, Christensen, Fogedby. *1/f noise, distribution of lifetimes, and a

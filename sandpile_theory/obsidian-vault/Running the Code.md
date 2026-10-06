@@ -54,5 +54,8 @@ python3 analyze.py
 > tweak, not a rewrite. `run_demo.jl` is lower risk: it's a closer port of
 > the already-validated Python reference.
 
+No Julia install needed at all to explore the model interactively — see
+[[Interactive Tutorial]] for a live version running entirely in the browser.
+
 See [[Avalanche Features]] and [[Novelty-Seeking Phase Transition]] for what
 the numbers these scripts print actually mean.

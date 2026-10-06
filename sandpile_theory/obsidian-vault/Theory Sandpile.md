@@ -17,6 +17,7 @@ start here and follow the links.
 - [[Self-Organized Criticality]] — the physics this model borrows
 - [[Bak-Tang-Wiesenfeld Sandpile]] — the unmodified base rule
 - [[Theory-Scientist Mapping]] — how sand becomes science
+- [[Known Sandpile Patterns]] — the eleven stylized facts BTW is famous for
 
 ## The five entry rules
 - [[Drive Rule - Uniform]]
@@ -28,6 +29,7 @@ start here and follow the links.
 ## What came out of it
 - [[Avalanche Features]]
 - [[Truncated Power-Law Fitting]]
+- [[Finite-Size Scaling]]
 - [[Novelty-Seeking Phase Transition]] — the main finding
 - [[Research Questions]]
 
@@ -36,9 +38,6 @@ start here and follow the links.
 
 ## Practical
 - [[Running the Code]]
+- [[Interactive Tutorial]]
 - [[Tooling - Python vs R vs Stata]]
 - [[References]]
-
----
-Companion interactive page: `tutorial.html` in the repository, also published
-at https://claude.ai/artifact/3dHFieeRjFspChFA39mG9j

@@ -28,7 +28,7 @@ Files:
 | `NOVELTY_RESULTS.md` | the original by-hand novelty-seeking writeup; superseded in rigor by `ANALYSIS.md` but kept for the narrative |
 | `tutorial.html` | an interactive, self-contained tutorial — a live in-browser reimplementation of the sandpile with a topic-choice-rule toggle, plus the SOC background, the mapping table, and the novelty-transition charts. Open the file directly, or see it published at <https://claude.ai/artifact/3dHFieeRjFspChFA39mG9j> |
 | `PHILOSOPHY.md` | what kind of philosophical research question this model is actually useful for (social epistemology of credit, aggregation failure, Kuhn's punctuated structure, emergence) — and where it has nothing to say (realism, belief-updating, strong incommensurability) |
-| `obsidian-vault/` | the same material as `README.md`/`ANALYSIS.md`/`PHILOSOPHY.md`, split into 21 linked, atomic notes (one concept per file, cross-referenced with `[[wikilinks]]`, tagged, with Obsidian callouts). Open the folder itself as an Obsidian vault; start from `Theory Sandpile.md`, the map of content |
+| `obsidian-vault/` | the same material as `README.md`/`ANALYSIS.md`/`PHILOSOPHY.md`/`tutorial.html`, split into 24 linked, atomic notes (one concept per file, cross-referenced with `[[wikilinks]]`, tagged, with Obsidian callouts). Open the folder itself as an Obsidian vault; start from `Theory Sandpile.md`, the map of content. Also shipped as `obsidian-vault.zip` for a one-click download |
 
 ---
 
