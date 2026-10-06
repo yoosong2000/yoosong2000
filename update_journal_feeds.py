@@ -235,6 +235,25 @@ def search_thematic_papers() -> List[Dict]:
     return thematic_articles
 
 
+def validate_feed_health(journal_name: str, articles: List[Dict]) -> Dict:
+    """Validate RSS feed quality and report potential issues."""
+    health = {
+        'journal': journal_name,
+        'article_count': len(articles),
+        'status': 'ok',
+        'warnings': []
+    }
+
+    if len(articles) == 0:
+        health['status'] = 'warning'
+        health['warnings'].append('No articles returned from feed')
+
+    if articles and len(articles) < 3:
+        health['warnings'].append(f'Very few articles ({len(articles)}) — feed may be incomplete')
+
+    return health
+
+
 def process_all_journals(download_pdfs: bool = False) -> Tuple[List[Dict], Dict]:
     """Process all journal feeds and optionally download PDFs."""
     all_articles = []
@@ -242,7 +261,8 @@ def process_all_journals(download_pdfs: bool = False) -> Tuple[List[Dict], Dict]
         'total_fetched': 0,
         'total_pdfs_attempted': 0,
         'pdfs_succeeded': 0,
-        'by_journal': {}
+        'by_journal': {},
+        'feed_health': []
     }
 
     logger.info(f"\n{'='*60}")
@@ -251,10 +271,21 @@ def process_all_journals(download_pdfs: bool = False) -> Tuple[List[Dict], Dict]
 
     for journal_name, feed_url in JOURNAL_FEEDS.items():
         articles = fetch_journal_feed(journal_name, feed_url)
+
+        # Validate feed health
+        health = validate_feed_health(journal_name, articles)
+        stats['feed_health'].append(health)
+
+        # Log warnings
+        if health['warnings']:
+            for warning in health['warnings']:
+                logger.warning(f"  ⚠ {journal_name}: {warning}")
+
         stats['total_fetched'] += len(articles)
         stats['by_journal'][journal_name] = {
             'fetched': len(articles),
-            'pdfs_succeeded': 0
+            'pdfs_succeeded': 0,
+            'feed_status': health['status']
         }
 
         if download_pdfs:
