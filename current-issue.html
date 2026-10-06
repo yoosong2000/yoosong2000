@@ -92,7 +92,27 @@
     max-width: 760px;
     margin: 0 auto;
     padding: 0 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
   }
+
+  .header-content { flex: 1; }
+
+  .archive-link {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-size: 0.72rem;
+    text-decoration: none;
+    color: var(--ink-soft);
+    white-space: nowrap;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1px;
+    align-self: center;
+    flex: none;
+  }
+
+  .archive-link:hover { color: var(--accent-ink); border-color: var(--accent); }
 
   .eyebrow {
     font-family: 'IBM Plex Mono', ui-monospace, monospace;
@@ -381,17 +401,23 @@
 
 <header class="top">
   <div class="inner">
-    <p class="eyebrow">Journal watch · philosophy of science &amp; social epistemology</p>
-    <h1>The Current Issue</h1>
-    <p class="sub">A snapshot of the latest tables of contents across thirteen journals in and around the field — first compiled 22 August 2026, rechecked the week of 1 September 2026. Search across titles and authors, or jump straight to a journal.</p>
+    <div class="header-content">
+      <p class="eyebrow">Journal watch · philosophy of science &amp; social epistemology</p>
+      <h1>The Current Issue</h1>
+      <p class="sub">A snapshot of the latest tables of contents across thirteen journals in and around the field — first compiled 22 August 2026, rechecked the week of 6 October 2026. Search across titles and authors, or jump straight to a journal.</p>
+    </div>
+    <a class="archive-link" href="https://claude.ai/artifact/YAeaWr1oDD82qdw5HM7ZfP">← Archive</a>
+  </div>
     <label class="searchbar">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       <input id="search" type="text" placeholder="Search titles, authors, journals…" autocomplete="off">
     </label>
     <div class="gaps">
       <p class="gaps-label">Worth checking with your RUB library access</p>
+      <ul>
         <li><a href="#data">Philosophy of Data</a> (thematic) — public search returned little; a proper database search would likely surface more.</li>
       </ul>
+    </div>
     </div>
   </div>
 </header>
@@ -733,7 +759,7 @@
   <p class="no-results" id="noResults">No articles or journals match that search.</p>
 
   <footer>
-    <p><strong>How this was built.</strong> First compiled 22–23 August 2026 by searching each publisher's table-of-contents page and, for the thematic watch, PhilPapers and PhilSci-Archive; rechecked 1 September 2026 for anything newer (BJPS and Social Epistemology had both moved to a new issue number — flagged above). Direct page fetches were blocked in this session both times, so entries come from indexed search snippets rather than a full crawl of every issue. Coverage is representative, not exhaustive — an article with no byline shown means an author name wasn't surfaced, not that one doesn't exist, and an issue flagged "verify against issue" has a newer issue number than its listed articles reflect. Click "View issue" or "Search PhilPapers" on any card for the fuller, current picture.</p>
+    <p><strong>How this was built.</strong> First compiled 22–23 August 2026 by searching each publisher's table-of-contents page and, for the thematic watch, PhilPapers and PhilSci-Archive; rechecked 1 September 2026 and again on 6 October 2026 for anything newer. Direct page fetches were blocked in this session, so entries come from indexed search snippets rather than a full crawl of every issue. Coverage is representative, not exhaustive — an article with no byline shown means an author name wasn't surfaced, not that one doesn't exist. Click "View issue" or "Search PhilPapers" on any card for the fuller, current picture.</p>
   </footer>
 
 </div>
