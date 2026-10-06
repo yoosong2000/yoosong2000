@@ -1,0 +1,262 @@
+# Paper Downloader Guide
+
+Automated download of newly detected papers to your Obsidian wiki raw materials and Mendeley reference folders.
+
+## Setup (One-Time)
+
+### 1. Verify Folders Exist
+```
+C:\Users\yooso\iCloudDrive\iCloud~md~obsidian\johny\raw\
+C:\Users\yooso\Desktop\reference papers\
+```
+
+Create them if missing. The downloader will check on startup.
+
+### 2. Install Dependencies (Windows)
+```bash
+# Run in PowerShell or Command Prompt on your Windows machine
+pip install requests beautifulsoup4
+```
+
+That's it — uses Python's built-in urllib for downloads.
+
+### 3. Enable RUB VPN/Library Access (Optional but Recommended)
+Some publishers require RUB login:
+- Connect to RUB VPN or university network
+- This lets the script access paywalled content
+- Without it: only open-access papers download automatically
+
+## Workflow
+
+### Complete End-to-End Flow
+```bash
+# On your cloud session (Linux)
+python3 update_journal_feeds.py        # Fetch latest papers
+python3 sync_webpage.py                # Update webpage
+
+# On your Windows machine
+python3 download_papers.py             # Download to both folders
+```
+
+### Windows-Only Setup (If No Cloud Access)
+If you prefer to run everything locally on Windows:
+```bash
+# Install feedparser
+pip install feedparser
+
+# Run all three scripts locally (you'll need the repo cloned)
+python3 update_journal_feeds.py
+python3 sync_webpage.py
+python3 download_papers.py
+```
+
+## Features
+
+### Automatic Downloads ✓
+- Attempts to download all paper links
+- Saves to both folders simultaneously
+- Tracks successful/failed downloads
+- Skips already-downloaded papers
+
+### Folder Sync
+```
+download_papers.py
+├── Downloads to: C:\Users\yooso\iCloudDrive\iCloud~md~obsidian\johny\raw\
+└── Copies to:   C:\Users\yooso\Desktop\reference papers\
+    └── Mendeley auto-detects new files
+```
+
+### Manual Download Support
+When automated download fails:
+1. Script generates `MANUAL_DOWNLOADS.md` with:
+   - Failed paper titles
+   - Direct links
+   - RUB login instructions
+2. You manually download via browser
+3. Save to either folder (script sync handles it)
+
+### Download Tracking
+Maintains `journal_data/downloads.json`:
+```json
+{
+  "downloaded": {
+    "Paper Title": {
+      "timestamp": "2026-10-06T...",
+      "journal": "Philosophy of Science",
+      "link": "https://...",
+      "filepath": "C:\\Users\\...\\paper.pdf"
+    }
+  },
+  "failed": {
+    "Paper Title": {
+      "timestamp": "2026-10-06T...",
+      "reason": "Access denied (403)"
+    }
+  }
+}
+```
+
+## Usage
+
+### Run on Windows
+```bash
+# Navigate to repo folder
+cd C:\Users\yooso\your-repo-location\yoosong2000
+
+# Run downloader
+python3 download_papers.py
+```
+
+### Output Example
+```
+Validating download folders...
+  ✓ Obsidian raw materials: C:\Users\yooso\iCloudDrive\iCloud~md~obsidian\johny\raw
+  ✓ Mendeley reference papers: C:\Users\yooso\Desktop\reference papers
+
+Processing 127 articles...
+============================================================
+
+[Philosophy of Science] Social Learning in Neural Agent-based Models
+  Downloading: Social Learning in Neural Agent-based Models
+    ✓ Downloaded (2,150 KB)
+    ✓ Copied to Mendeley folder
+
+[BJPS] Understanding Structural Representations
+  Downloading: Understanding Structural Representations
+    ✗ Access denied (403) — may need RUB login
+
+============================================================
+DOWNLOAD SUMMARY
+============================================================
+Total articles processed: 127
+Successfully downloaded: 89
+Failed/needs manual: 38
+Success rate: 70.1%
+
+📁 Obsidian raw materials: C:\Users\yooso\iCloudDrive\iCloud~md~obsidian\johny\raw
+📁 Mendeley folder: C:\Users\yooso\Desktop\reference papers
+
+Download log: C:\Users\yooso\your-repo-location\yoosong2000\journal_data\downloads.json
+```
+
+## Troubleshooting
+
+### "Folder not found"
+- Create the missing folder manually
+- Run script again
+
+### "Access denied (403)"
+- Paper is behind paywall
+- Solution: Connect to RUB VPN, then retry
+- Or manually download via browser (see MANUAL_DOWNLOADS.md)
+
+### "Downloaded file too small"
+- Script detected error page, not actual PDF
+- Check if URL is correct
+- Manually download via browser
+
+### "Nothing downloads"
+- Network connectivity issue
+- Test: `ping google.com` (Windows)
+- Or check firewall/VPN settings
+
+### Mendeley Not Detecting Files
+- Verify folder path: `C:\Users\yooso\Desktop\reference papers\`
+- Restart Mendeley
+- Check Mendeley settings → Watch Folders → ensure path is added
+- Files will auto-import within 1-2 minutes
+
+## Advanced Options
+
+### Filter by Journal
+Edit `download_papers.py` to add filtering:
+```python
+# Only download from Philosophy of Science
+for article in articles:
+    if article['journal'] != 'Philosophy of Science':
+        continue
+    # ... download logic
+```
+
+### Bulk Manual Download
+If automated download has low success rate:
+1. Open `MANUAL_DOWNLOADS.md` generated by script
+2. Open all links in browser tabs
+3. Batch download using browser
+4. Save all to `C:\Users\yooso\Desktop\reference papers\`
+5. Move to Obsidian folder via file explorer if needed
+
+### Retry Failed Downloads
+```python
+# Run script again — it skips already-downloaded papers
+# But will retry papers that previously failed (except same session)
+
+# To retry a specific paper:
+# 1. Remove from downloads.json "failed" section
+# 2. Run download_papers.py again
+```
+
+## Integration with Workflow
+
+### Recommended Schedule
+
+**Weekly Updates**:
+```
+Monday morning:
+1. Run update_journal_feeds.py (cloud or local)
+2. Run sync_webpage.py (cloud or local)  
+3. Run download_papers.py (Windows)
+4. Check MANUAL_DOWNLOADS.md for failed papers
+```
+
+**Monthly**:
+- Review downloads.json for patterns
+- Note which journals have high failure rates
+- Consider RUB VPN login automation (if advanced)
+
+## File Organization
+
+After running download_papers.py:
+
+**Obsidian Folder**:
+```
+C:\Users\yooso\iCloudDrive\iCloud~md~obsidian\johny\raw\
+├── Social Learning in Neural Agent-based Models.pdf
+├── Understanding Structural Representations.pdf
+├── ...
+└── [syncs to iCloud automatically]
+```
+
+**Mendeley Folder**:
+```
+C:\Users\yooso\Desktop\reference papers\
+├── Social Learning in Neural Agent-based Models.pdf
+├── Understanding Structural Representations.pdf
+├── ...
+└── [Mendeley watches folder, auto-imports]
+```
+
+## Next Steps
+
+1. Test script with current journals_latest.json
+2. If success rate is low, check RUB VPN
+3. Use MANUAL_DOWNLOADS.md for unavailable papers
+4. Adjust folder paths if needed (see setup)
+5. Add to Windows Task Scheduler for automated weekly runs (optional)
+
+## Known Limitations
+
+- Some publishers block automated downloads
+- Requires RUB access for paywalled content
+- DOI links may require extra hops
+- Large files (100+ MB) may timeout
+- Some PDFs have DRM/watermarks (still downloads)
+
+## Future Enhancements
+
+Possible additions:
+- Automatic RUB VPN login
+- Batch browser automation (Selenium)
+- PDF metadata extraction for Mendeley
+- OCR for image-based PDFs
+- Automatic citation export to Obsidian
