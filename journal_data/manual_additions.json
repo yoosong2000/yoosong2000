@@ -1,0 +1,26 @@
+{
+  "description": "Manual additions for papers not yet captured by RSS feeds. Add recent publications here to ensure they appear in the next sync.",
+  "version": "2026-10-06",
+  "thematic_papers": {
+    "agent-based-models": [
+      {
+        "title": "Social Learning in Neural Agent-based Models",
+        "authors": "Authors TBD",
+        "journal": "Philosophy of Science",
+        "year": 2026,
+        "doi": "",
+        "link": "https://www.cambridge.org/core/journals/philosophy-of-science/article/social-learning-in-neural-agentbased-models/88677994DD97E8824060FEF77943B641",
+        "published": "2026-10-06",
+        "summary": "Examines social learning mechanisms in neural agent-based models and their implications for epistemology.",
+        "status": "awaiting_rss_indexing"
+      }
+    ],
+    "philosophy-of-data": [],
+    "philosophy-of-models": []
+  },
+  "notes": [
+    "Papers here will be merged with RSS feed results in sync_webpage.py",
+    "Once RSS feeds index a paper, remove it from here to avoid duplication",
+    "Check papers for duplicate detection using title and DOI matching"
+  ]
+}

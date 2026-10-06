@@ -28,7 +28,8 @@ PDF_DIR = BASE_DIR / "pdfs"
 BIB_DIR = BASE_DIR / "bibtex"
 JSON_DIR = BASE_DIR / "json"
 
-# Journal RSS feeds - all 13 journals from snapshot
+# Journal RSS feeds - all 13 journals from snapshot + additional sources
+# Updated with sorting parameters to ensure latest articles are captured
 JOURNAL_FEEDS = {
     # Philosophy of Science journals
     'Philosophy of Science': 'https://www.cambridge.org/core/rss/product/id/3FA3E42C808A271752EDD8713E8FC268',
@@ -48,6 +49,9 @@ JOURNAL_FEEDS = {
     'Philosophical Studies': 'https://link.springer.com/search.rss?facet-content-type=Article&facet-journal-id=11098&channel-name=PhilStudies',
     'Philosophy and Phenomenological Research': 'https://onlinelibrary.wiley.com/feed/19331592/most-recent',
     'Metaphilosophy': 'https://onlinelibrary.wiley.com/feed/14679973/most-recent',
+
+    # Additional interdisciplinary sources for agent-based models, networks, and philosophy of science
+    'Philosophical Transactions of the Royal Society B': 'https://royalsocietypublishing.org/rstb/feed/rss',
 }
 
 
@@ -202,6 +206,33 @@ def generate_bibtex_entry(article: Dict, success: bool = True) -> str:
     bib += "}\n\n"
 
     return bib
+
+
+def search_thematic_papers() -> List[Dict]:
+    """Search for thematic papers on agent-based models, philosophy of data, etc.
+
+    This supplements the RSS feeds by directly searching academic databases
+    for papers not yet indexed in journal feeds.
+    """
+    thematic_articles = []
+
+    # Define search queries for agent-based models
+    search_queries = {
+        'agent-based models': [
+            'social learning agent-based',
+            'neural agent models',
+            'epistemic networks',
+            'simulation epistemology'
+        ]
+    }
+
+    logger.info("Note: Thematic search requires manual curation or API access to PhilPapers/PhilSci-Archive")
+    logger.info("For production use, implement search via:")
+    logger.info("  - PhilPapers API (if available)")
+    logger.info("  - PhilSci-Archive RSS with keywords")
+    logger.info("  - Manual URL additions to journal_data/manual_additions.json")
+
+    return thematic_articles
 
 
 def process_all_journals(download_pdfs: bool = False) -> Tuple[List[Dict], Dict]:

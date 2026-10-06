@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 
 BASE_DIR = Path.home() / "yoosong2000"
 JSON_FILE = BASE_DIR / "journal_data" / "journals_latest.json"
+MANUAL_FILE = BASE_DIR / "journal_data" / "manual_additions.json"
 HTML_FILE = BASE_DIR / "current-issue.html"
 
 
@@ -28,6 +29,27 @@ def load_journal_data() -> Dict:
 
     with open(JSON_FILE, 'r', encoding='utf-8') as f:
         return json.load(f)
+
+
+def load_manual_additions() -> List[Dict]:
+    """Load manually-added papers that aren't in RSS feeds yet."""
+    if not MANUAL_FILE.exists():
+        return []
+
+    try:
+        with open(MANUAL_FILE, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+
+        articles = []
+        for section in ['agent-based-models', 'philosophy-of-data', 'philosophy-of-models']:
+            if section in data.get('thematic_papers', {}):
+                articles.extend(data['thematic_papers'][section])
+
+        logger.info(f"Loaded {len(articles)} manual additions")
+        return articles
+    except Exception as e:
+        logger.warning(f"Error loading manual additions: {e}")
+        return []
 
 
 def group_articles_by_journal(articles: List[Dict]) -> Dict[str, List[Dict]]:
@@ -134,7 +156,16 @@ def main():
     if not data:
         return
 
-    logger.info(f"Loaded {data['total_articles']} articles")
+    logger.info(f"Loaded {data['total_articles']} articles from RSS feeds")
+
+    # Load and merge manual additions
+    manual_articles = load_manual_additions()
+    if manual_articles:
+        data['articles'].extend(manual_articles)
+        data['total_articles'] = len(data['articles'])
+        logger.info(f"Added {len(manual_articles)} manual articles")
+        logger.info(f"Total articles now: {data['total_articles']}")
+
     sync_webpage(data)
 
 
